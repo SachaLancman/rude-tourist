@@ -1,15 +1,18 @@
 import { useEffect, useState, type CSSProperties } from 'react'
 import { Logo } from './Logo'
-import type { HomeLang } from './phrases'
+import { LANGS, PHRASES, type HomeLang } from './phrases'
 import type { Plan } from './pro'
 
 // One message, a checklist, two plans, one button (paywall tips #31, #15, #17, #83).
 // Payments are not wired yet, so the button only says so and charges nothing.
+const INSULTS = PHRASES.filter((p) => p.cat === 'insult').length
+const LANG_COUNT = Object.keys(LANGS).length
+
 const COPY = {
   en: {
     headline: 'Swear like a local.',
-    sub: 'Every insult and every survival line, in 11 languages, spoken by a real voice.',
-    checks: ['All 16 insults, in 11 languages', 'Taxi, Restaurant & Nightlife packs', 'Every new pack we add', 'Real voices and pronunciation'],
+    sub: `Every insult and every survival line, in ${LANG_COUNT} languages, spoken by a real voice.`,
+    checks: [`All ${INSULTS} insults, in ${LANG_COUNT} languages`, 'Taxi, Restaurant & Nightlife packs', 'Practice mode: half speed, time to repeat', 'Every new pack we add'],
     trip: { name: 'Trip Pass', price: '$2.99', per: '/ week', note: 'Perfect for one trip' },
     year: { name: 'Yearly', price: '$29.99', per: '/ year', note: 'Only $0.58/week · 3 days free' },
     best: 'Best value',
@@ -22,8 +25,8 @@ const COPY = {
   },
   fr: {
     headline: 'Jure comme un local.',
-    sub: 'Toutes les insultes et toutes les phrases de survie, en 11 langues, avec une vraie voix.',
-    checks: ['Les 16 insultes, en 11 langues', 'Packs Taxi, Restaurant et Soirée', 'Chaque nouveau pack', 'Vraies voix et prononciation'],
+    sub: `Toutes les insultes et toutes les phrases de survie, en ${LANG_COUNT} langues, avec une vraie voix.`,
+    checks: [`Les ${INSULTS} insultes, en ${LANG_COUNT} langues`, 'Packs Taxi, Restaurant et Soirée', 'Entraînement : demi-vitesse, le temps de répéter', 'Chaque nouveau pack'],
     trip: { name: 'Pass Voyage', price: '2,99 $', per: '/ semaine', note: 'Parfait pour un voyage' },
     year: { name: 'Annuel', price: '29,99 $', per: '/ an', note: 'Seulement 0,58 $/semaine · 3 jours offerts' },
     best: 'Meilleure offre',

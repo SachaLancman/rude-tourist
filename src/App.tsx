@@ -1,4 +1,4 @@
-import { useEffect, useState, type CSSProperties } from 'react'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { Intro } from './Intro'
 import { Logo } from './Logo'
 import { Paywall } from './Paywall'
@@ -94,6 +94,10 @@ const UI = {
     full: `Board full (${MAX_BOARD} max)`,
     sayIt: 'Say it',
     slow: 'Slowly',
+    practice: 'Practice',
+    listen: 'Listen…',
+    yourTurn: 'Your turn!',
+    stop: 'Stop',
     soundsLike: 'Sounds like',
     noVoice: 'No voice for this language on your device. Show the screen instead.',
     change: 'Change',
@@ -119,6 +123,10 @@ const UI = {
     full: `Tableau plein (${MAX_BOARD} max)`,
     sayIt: 'Le dire',
     slow: 'Lentement',
+    practice: 'Entraînement',
+    listen: 'Écoute…',
+    yourTurn: 'À toi !',
+    stop: 'Stop',
     soundsLike: 'Se prononce',
     noVoice: "Pas de voix pour cette langue sur ton appareil. Montre l'écran à la place.",
     change: 'Changer',
@@ -211,7 +219,7 @@ export default function App() {
         <Library key="library" settings={settings} onToggle={toggle} onLocked={showPaywall} />
       )}
 
-      {open && <PhraseCard phrase={open} settings={settings} onClose={() => { stopSpeaking(); setOpen(null) }} />}
+      {open && <PhraseCard phrase={open} settings={settings} onLocked={showPaywall} onClose={() => { stopSpeaking(); setOpen(null) }} />}
       {picking && (
         <div className="overlay" onClick={() => setPicking(false)}>
           <div className="card" role="dialog" aria-modal="true" aria-label={t.look} onClick={(e) => e.stopPropagation()}>
@@ -432,13 +440,68 @@ function Library({ settings, onToggle, onLocked }: { settings: Settings; onToggl
   )
 }
 
-function PhraseCard({ phrase, settings, onClose }: { phrase: Phrase; settings: Settings; onClose: () => void }) {
+// Practice mode (Pro): the phrase at half speed, then a silent gap to repeat it, three times.
+const PRACTICE_RATE = 0.5
+const PRACTICE_ROUNDS = 3
+
+type Drill = { round: number; phase: 'listen' | 'you' }
+
+function PhraseCard({ phrase, settings, onLocked, onClose }: {
+  phrase: Phrase
+  settings: Settings
+  onLocked: () => void
+  onClose: () => void
+}) {
   const t = UI[settings.home]
   const target = settings.target
   const [silent, setSilent] = useState(false)
   const [speaking, setSpeaking] = useState(false)
+  const [drill, setDrill] = useState<Drill | null>(null)
+  const gap = useRef<number | undefined>(undefined)
   const pron = phrase.pron[target][settings.home]
+
+  const stopDrill = () => {
+    window.clearTimeout(gap.current)
+    setDrill(null)
+  }
+
+  const drillRound = (round: number) => {
+    setDrill({ round, phase: 'listen' })
+    setSpeaking(true)
+    const started = performance.now()
+    playPhrase(phrase, target, PRACTICE_RATE, () => {
+      setSpeaking(false)
+      setDrill({ round, phase: 'you' })
+      // Give the learner as long as the slow clip took, plus a breath.
+      const wait = Math.max(1500, performance.now() - started + 600)
+      gap.current = window.setTimeout(() => {
+        if (round < PRACTICE_ROUNDS) drillRound(round + 1)
+        else setDrill(null)
+      }, wait)
+    }).then((ok) => {
+      if (ok) return
+      setSilent(true)
+      setSpeaking(false)
+      setDrill(null)
+    })
+  }
+
+  const practice = () => {
+    if (!IS_PRO) return onLocked()
+    window.clearTimeout(gap.current)
+    if (drill) {
+      stopSpeaking()
+      setSpeaking(false)
+      setDrill(null)
+      return
+    }
+    drillRound(1)
+  }
+
+  useEffect(() => () => window.clearTimeout(gap.current), [])
+
   const play = (rate = 1) => {
+    stopDrill()
     setSpeaking(true)
     playPhrase(phrase, target, rate, () => setSpeaking(false)).then((ok) => {
       setSilent(!ok)
@@ -492,6 +555,24 @@ function PhraseCard({ phrase, settings, onClose }: { phrase: Phrase; settings: S
           </button>
           <button className="secondary" onClick={() => play(0.7)}>🐢 {t.slow}</button>
         </div>
+        <button className={`practice${drill ? ' on' : ''}`} onClick={practice} aria-live="polite">
+          {drill ? (
+            <>
+              <span className="practice-dots" aria-hidden="true">
+                {Array.from({ length: PRACTICE_ROUNDS }, (_, i) => (
+                  <i key={i} className={i < drill.round ? 'done' : ''} />
+                ))}
+              </span>
+              {drill.phase === 'listen' ? t.listen : t.yourTurn}
+              <span className="practice-stop">{t.stop}</span>
+            </>
+          ) : (
+            <>
+              🔁 {t.practice} <span className="practice-rate">×{PRACTICE_RATE}</span>
+              {!IS_PRO && <span className="pro-chip">Pro</span>}
+            </>
+          )}
+        </button>
       </div>
     </div>
   )

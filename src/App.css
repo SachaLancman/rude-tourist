@@ -532,6 +532,38 @@ h2 {
 .card-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .card-actions button { white-space: nowrap; padding-inline: 12px; }
 
+/* Practice mode: very slow, with a gap to repeat after the voice */
+.practice {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 10px;
+  padding: 12px 16px;
+  border: 1.5px dashed var(--line);
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+.practice .pro-chip { margin-left: 0; }
+.practice-rate { font-variant-numeric: tabular-nums; opacity: 0.7; }
+.practice.on {
+  border-style: solid;
+  border-color: var(--hard);
+  color: var(--ink);
+}
+.practice-stop { margin-left: auto; font-size: 13px; opacity: 0.7; }
+.practice-dots { display: inline-flex; gap: 5px; }
+.practice-dots i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1.5px solid var(--hard);
+}
+.practice-dots i.done { background: var(--terracotta); border-color: var(--terracotta); }
+
 @keyframes fade { from { opacity: 0; } }
 @keyframes rise { from { transform: translateY(40px); opacity: 0; } }
 

@@ -14,7 +14,8 @@ const BUILTIN = { id: 'JBFqnCBsd6RMkjVDRZzb', name: 'George' }
 
 // One native speaker per language from the ElevenLabs voice library. Needs a paid plan
 // (free accounts cannot use library voices via the API). Use with --native --force.
-const NATIVE_VOICES: Record<Lang, { id: string; name: string }> = {
+// Languages added after the voice survey have no picked voice yet and use the built-in one.
+const NATIVE_VOICES: Partial<Record<Lang, { id: string; name: string }>> = {
   en: { id: 'JBFqnCBsd6RMkjVDRZzb', name: 'George' },
   fr: { id: 'AfbuxQ9DVtS4azaxN1W7', name: 'Léo' },
   es: { id: 'HMCmDsbKeaSZp5LMOYKR', name: 'Johnny' },
@@ -57,7 +58,7 @@ const chars = jobs.reduce((n, j) => n + j.text.length, 0)
 console.log(`${jobs.length} clips to generate, ${chars} characters`)
 
 async function generate(job: (typeof jobs)[number]) {
-  const voice = native ? NATIVE_VOICES[job.lang] : BUILTIN
+  const voice = (native && NATIVE_VOICES[job.lang]) || BUILTIN
   const res = await fetch(
     `https://api.elevenlabs.io/v1/text-to-speech/${voice.id}?output_format=mp3_44100_128`,
     {
