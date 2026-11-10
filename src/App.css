@@ -492,15 +492,13 @@ h2 {
 .empty p { color: var(--ink-soft); font-size: 18px; font-style: italic; margin: 0; }
 
 /* Library */
+/* Categories wrap onto a second line rather than scroll, so none hide off-screen. */
 .chips {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
-  margin: 0 -16px;
-  padding: 4px 16px 8px;
-  overflow-x: auto;
-  scrollbar-width: none;
+  padding: 4px 0 8px;
 }
-.chips::-webkit-scrollbar { display: none; }
 .chips button {
   flex: none;
   display: inline-flex;
