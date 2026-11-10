@@ -15,6 +15,7 @@ export const LANGS: Record<Lang, { name: Record<HomeLang, string>; locale: strin
   it: { name: { en: 'Italian', fr: 'Italien', es: 'Italiano', de: 'Italienisch', it: 'Italiano', pt: 'Italiano', nl: 'Italiaans' }, locale: 'it-IT' },
   de: { name: { en: 'German', fr: 'Allemand', es: 'Alemán', de: 'Deutsch', it: 'Tedesco', pt: 'Alemão', nl: 'Duits' }, locale: 'de-DE' },
   pt: { name: { en: 'Portuguese (Brazil)', fr: 'Portugais (Brésil)', es: 'Portugués (Brasil)', de: 'Portugiesisch (Brasilien)', it: 'Portoghese (Brasile)', pt: 'Português (Brasil)', nl: 'Portugees (Brazilië)' }, locale: 'pt-BR' },
+  'pt-pt': { name: { en: 'Portuguese (Portugal)', fr: 'Portugais (Portugal)', es: 'Portugués (Portugal)', de: 'Portugiesisch (Portugal)', it: 'Portoghese (Portogallo)', pt: 'Português (Portugal)', nl: 'Portugees (Portugal)' }, locale: 'pt-PT' },
   nl: { name: { en: 'Dutch', fr: 'Néerlandais', es: 'Neerlandés', de: 'Niederländisch', it: 'Olandese', pt: 'Holandês', nl: 'Nederlands' }, locale: 'nl-NL' },
   ja: { name: { en: 'Japanese', fr: 'Japonais', es: 'Japonés', de: 'Japanisch', it: 'Giapponese', pt: 'Japonês', nl: 'Japans' }, locale: 'ja-JP' },
   el: { name: { en: 'Greek', fr: 'Grec', es: 'Griego', de: 'Griechisch', it: 'Greco', pt: 'Grego', nl: 'Grieks' }, locale: 'el-GR' },

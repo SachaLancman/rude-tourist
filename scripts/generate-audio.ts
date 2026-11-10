@@ -67,7 +67,7 @@ async function generate(job: (typeof jobs)[number]) {
       body: JSON.stringify({
         text: job.text,
         model_id: MODEL,
-        language_code: job.lang,
+        language_code: job.lang.slice(0, 2), // 'pt-pt' is still Portuguese to the API
         voice_settings: { stability: 0.4, similarity_boost: 0.8, style: 0.35 },
       }),
     },

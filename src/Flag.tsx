@@ -12,12 +12,13 @@ import jp from 'flag-icons/flags/4x3/jp.svg'
 import kr from 'flag-icons/flags/4x3/kr.svg'
 import nl from 'flag-icons/flags/4x3/nl.svg'
 import pl from 'flag-icons/flags/4x3/pl.svg'
+import pt from 'flag-icons/flags/4x3/pt.svg'
 import th from 'flag-icons/flags/4x3/th.svg'
 import tr from 'flag-icons/flags/4x3/tr.svg'
 import type { Lang } from './phrases'
 
 const FLAGS: Record<Lang, string> = {
-  en: gb, fr, es, it, de, pt: br, nl, ja: jp, el: gr, tr, pl, zh: cn, ko: kr, th, id,
+  en: gb, fr, es, it, de, pt: br, 'pt-pt': pt, nl, ja: jp, el: gr, tr, pl, zh: cn, ko: kr, th, id,
 }
 
 export function Flag({ lang, size = 22 }: { lang: Lang; size?: number }) {
