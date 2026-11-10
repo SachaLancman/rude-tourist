@@ -2,19 +2,26 @@ import { useEffect, useState, type CSSProperties } from 'react'
 import { Intro } from './Intro'
 import { Logo } from './Logo'
 import {
-  DEFAULT_BOARD, HOME_LANGS, LANGS, MAX_BOARD, PHRASES, PHRASE_BY_ID,
+  CATEGORIES, DEFAULT_BOARD, HOME_LANGS, LANGS, MAX_BOARD, PHRASES, PHRASE_BY_ID,
   type Category, type HomeLang, type Lang, type Phrase,
 } from './phrases'
+import { SKINS, applySkin, loadSkin, type Skin } from './skins'
 import { playPhrase, stopSpeaking } from './speech'
 import './App.css'
 
 // Small tilts so board tiles sit like stickers slapped on a suitcase, not a spreadsheet.
 const TILTS = [-1.6, 1.2, -0.8, 1.8, -1.2, 0.9, 1.5, -1.9]
 
-const BURST = {
+const BURST: Record<Category, string[]> = {
   insult: ['⚡', '★', '!', '#', '@', '$', '%', '✱'],
   basic: ['✓', '✈', '☀', '♥', '★', '✓', '☺', '✱'],
+  taxi: ['$', '!', '⚡', '€', '?', '!', '$', '✱'],
+  food: ['♨', '★', '!', '♥', '✱', '★', '♨', '!'],
+  night: ['♪', '★', '♥', '✱', '♫', '★', '♪', '!'],
 }
+
+// Small mark in each tile's corner, and on the library chips.
+const CAT_MARK: Record<Category, string> = { insult: '#@!', basic: '✓', taxi: '🚕', food: '🍝', night: '🍸' }
 
 const prefersReducedMotion = () => {
   try {
@@ -76,6 +83,10 @@ const UI = {
     empty: 'Your board is empty. Add phrases from the library.',
     insult: 'Insults',
     basic: 'Survival',
+    taxi: 'Taxi',
+    food: 'Restaurant',
+    night: 'Nightlife',
+    look: 'Look',
     add: 'Add',
     remove: 'Remove',
     full: `Board full (${MAX_BOARD} max)`,
@@ -97,6 +108,10 @@ const UI = {
     empty: 'Ton tableau est vide. Ajoute des phrases depuis la bibliothèque.',
     insult: 'Insultes',
     basic: 'Survie',
+    taxi: 'Taxi',
+    food: 'Restaurant',
+    night: 'Soirée',
+    look: 'Style',
     add: 'Ajouter',
     remove: 'Retirer',
     full: `Tableau plein (${MAX_BOARD} max)`,
@@ -115,10 +130,14 @@ export default function App() {
   const [screen, setScreen] = useState<Screen>(settings ? 'board' : 'setup')
   const [open, setOpen] = useState<Phrase | null>(null)
   const [intro, setIntro] = useState(() => !prefersReducedMotion())
+  const [skin, setSkin] = useState<Skin>(loadSkin)
+  const [picking, setPicking] = useState(false)
 
   useEffect(() => {
     if (settings) saveSettings(settings)
   }, [settings])
+
+  useEffect(() => applySkin(skin), [skin])
 
   const introHome: HomeLang = settings?.home ?? (navigator.language.startsWith('fr') ? 'fr' : 'en')
   const introLayer = intro && <Intro tagline={UI[introHome].tagline} onDone={() => setIntro(false)} />
@@ -128,6 +147,8 @@ export default function App() {
       <>
         <Setup
           initial={settings}
+          skin={skin}
+          onSkin={setSkin}
           onDone={(home, target) => {
             setSettings({ home, target, board: settings?.board ?? DEFAULT_BOARD })
             setScreen('board')
@@ -150,12 +171,18 @@ export default function App() {
   return (
     <div className="app">
       <header className="top">
-        <button className="lang-chip" onClick={() => setScreen('setup')} aria-label={t.change}>
-          <span>{LANGS[settings.home].flag}</span>
-          <span className="arrow">→</span>
-          <span>{LANGS[settings.target].flag}</span>
-          <span className="lang-chip-name">{LANGS[settings.target].name[settings.home]}</span>
-        </button>
+        <div className="top-row">
+          <button className="lang-chip" onClick={() => setScreen('setup')} aria-label={t.change}>
+            <span>{LANGS[settings.home].flag}</span>
+            <span className="arrow">→</span>
+            <span>{LANGS[settings.target].flag}</span>
+            <span className="lang-chip-name">{LANGS[settings.target].name[settings.home]}</span>
+          </button>
+          <button className="look-btn" onClick={() => setPicking(true)} aria-label={t.look}>
+            <SwatchDots colors={SKINS.find((s) => s.id === skin)!.swatch} />
+            {t.look}
+          </button>
+        </div>
         <nav className="tabs">
           <button className={screen === 'board' ? 'on' : ''} onClick={() => setScreen('board')}>{t.board}</button>
           <button className={screen === 'library' ? 'on' : ''} onClick={() => setScreen('library')}>{t.library}</button>
@@ -170,7 +197,50 @@ export default function App() {
       )}
 
       {open && <PhraseCard phrase={open} settings={settings} onClose={() => { stopSpeaking(); setOpen(null) }} />}
+      {picking && (
+        <div className="overlay" onClick={() => setPicking(false)}>
+          <div className="card" role="dialog" aria-modal="true" aria-label={t.look} onClick={(e) => e.stopPropagation()}>
+            <button className="close" onClick={() => setPicking(false)} aria-label="Close">×</button>
+            <h2>{t.look}</h2>
+            <SkinPicker home={settings.home} skin={skin} onSkin={setSkin} />
+          </div>
+        </div>
+      )}
       {introLayer}
+    </div>
+  )
+}
+
+function SwatchDots({ colors }: { colors: string[] }) {
+  return (
+    <span className="swatch-dots" aria-hidden="true">
+      {colors.map((c, i) => <i key={i} style={{ background: c }} />)}
+    </span>
+  )
+}
+
+// Each look shown as a tiny postcard of its own colors.
+function SkinPicker({ home, skin, onSkin }: { home: HomeLang; skin: Skin; onSkin: (s: Skin) => void }) {
+  return (
+    <div className="skins">
+      {SKINS.map((s) => (
+        <button
+          key={s.id}
+          className={`skin${skin === s.id ? ' on' : ''}`}
+          aria-pressed={skin === s.id}
+          onClick={() => {
+            buzz()
+            onSkin(s.id)
+          }}
+        >
+          <span className="skin-card" style={{ background: s.swatch[0] }} aria-hidden="true">
+            <i style={{ background: s.swatch[1] }} />
+            <i style={{ background: s.swatch[2] }} />
+            <i style={{ background: s.swatch[3] }} />
+          </span>
+          {s.name[home]}
+        </button>
+      ))}
     </div>
   )
 }
@@ -194,7 +264,12 @@ function Ticker({ target }: { target: Lang }) {
   )
 }
 
-function Setup({ initial, onDone }: { initial: Settings | null; onDone: (home: HomeLang, target: Lang) => void }) {
+function Setup({ initial, skin, onSkin, onDone }: {
+  initial: Settings | null
+  skin: Skin
+  onSkin: (s: Skin) => void
+  onDone: (home: HomeLang, target: Lang) => void
+}) {
   const [home, setHome] = useState<HomeLang>(initial?.home ?? (navigator.language.startsWith('fr') ? 'fr' : 'en'))
   const [target, setTarget] = useState<Lang | null>(initial?.target ?? null)
   const t = UI[home]
@@ -240,6 +315,11 @@ function Setup({ initial, onDone }: { initial: Settings | null; onDone: (home: H
         </div>
       </section>
 
+      <section>
+        <h2>{t.look}</h2>
+        <SkinPicker home={home} skin={skin} onSkin={onSkin} />
+      </section>
+
       <button className="primary" disabled={!target} onClick={() => target && onDone(home, target)}>
         {t.start}
       </button>
@@ -277,7 +357,7 @@ function Board({ settings, onOpen, onLibrary }: { settings: Settings; onOpen: (p
             onOpen(p)
           }}
         >
-          <span className="tile-mark" aria-hidden="true">{p.cat === 'insult' ? '#@!' : '✓'}</span>
+          <span className="tile-mark" aria-hidden="true">{CAT_MARK[p.cat]}</span>
           <span className="tile-text">{p.text[settings.home]}</span>
           <span className="tile-target" lang={LANGS[settings.target].locale}>{p.text[settings.target]}</span>
         </button>
@@ -293,9 +373,12 @@ function Library({ settings, onToggle }: { settings: Settings; onToggle: (id: st
 
   return (
     <main className="library">
-      <div className="seg">
-        {(['insult', 'basic'] as Category[]).map((c) => (
-          <button key={c} className={cat === c ? 'on' : ''} onClick={() => setCat(c)}>{t[c]}</button>
+      <div className="chips" role="tablist">
+        {CATEGORIES.map((c) => (
+          <button key={c} role="tab" aria-selected={cat === c} className={cat === c ? 'on' : ''} onClick={() => setCat(c)}>
+            <span aria-hidden="true">{CAT_MARK[c]}</span>
+            {t[c]}
+          </button>
         ))}
       </div>
       <p className="count">{settings.board.length} / {MAX_BOARD}{full ? ` · ${t.full}` : ''}</p>
