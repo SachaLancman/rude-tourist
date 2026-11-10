@@ -4,30 +4,30 @@ type CoreLang = 'en' | 'fr' | 'es' | 'it' | 'de'
 type PackLang = keyof typeof PACKS
 export type Lang = CoreLang | PackLang
 // Languages the app can explain things in. Pronunciation guides are written for these readers.
-export type HomeLang = 'en' | 'fr' | 'es' | 'de' | 'it' | 'pt' | 'nl'
+export type HomeLang = 'en' | 'fr' | 'es' | 'de' | 'it' | 'pt' | 'nl' | 'pl' | 'tr' | 'el' | 'ja' | 'zh' | 'ko' | 'th' | 'id'
 export type Category = 'insult' | 'basic' | 'taxi' | 'food' | 'night'
 export const CATEGORIES: Category[] = ['insult', 'basic', 'taxi', 'food', 'night']
 
 export const LANGS: Record<Lang, { name: Record<HomeLang, string>; locale: string }> = {
-  en: { name: { en: 'English', fr: 'Anglais', es: 'Inglés', de: 'Englisch', it: 'Inglese', pt: 'Inglês', nl: 'Engels' }, locale: 'en-GB' },
-  fr: { name: { en: 'French', fr: 'Français', es: 'Francés', de: 'Französisch', it: 'Francese', pt: 'Francês', nl: 'Frans' }, locale: 'fr-FR' },
-  es: { name: { en: 'Spanish', fr: 'Espagnol', es: 'Español', de: 'Spanisch', it: 'Spagnolo', pt: 'Espanhol', nl: 'Spaans' }, locale: 'es-ES' },
-  it: { name: { en: 'Italian', fr: 'Italien', es: 'Italiano', de: 'Italienisch', it: 'Italiano', pt: 'Italiano', nl: 'Italiaans' }, locale: 'it-IT' },
-  de: { name: { en: 'German', fr: 'Allemand', es: 'Alemán', de: 'Deutsch', it: 'Tedesco', pt: 'Alemão', nl: 'Duits' }, locale: 'de-DE' },
-  pt: { name: { en: 'Portuguese (Brazil)', fr: 'Portugais (Brésil)', es: 'Portugués (Brasil)', de: 'Portugiesisch (Brasilien)', it: 'Portoghese (Brasile)', pt: 'Português (Brasil)', nl: 'Portugees (Brazilië)' }, locale: 'pt-BR' },
-  'pt-pt': { name: { en: 'Portuguese (Portugal)', fr: 'Portugais (Portugal)', es: 'Portugués (Portugal)', de: 'Portugiesisch (Portugal)', it: 'Portoghese (Portogallo)', pt: 'Português (Portugal)', nl: 'Portugees (Portugal)' }, locale: 'pt-PT' },
-  nl: { name: { en: 'Dutch', fr: 'Néerlandais', es: 'Neerlandés', de: 'Niederländisch', it: 'Olandese', pt: 'Holandês', nl: 'Nederlands' }, locale: 'nl-NL' },
-  ja: { name: { en: 'Japanese', fr: 'Japonais', es: 'Japonés', de: 'Japanisch', it: 'Giapponese', pt: 'Japonês', nl: 'Japans' }, locale: 'ja-JP' },
-  el: { name: { en: 'Greek', fr: 'Grec', es: 'Griego', de: 'Griechisch', it: 'Greco', pt: 'Grego', nl: 'Grieks' }, locale: 'el-GR' },
-  tr: { name: { en: 'Turkish', fr: 'Turc', es: 'Turco', de: 'Türkisch', it: 'Turco', pt: 'Turco', nl: 'Turks' }, locale: 'tr-TR' },
-  pl: { name: { en: 'Polish', fr: 'Polonais', es: 'Polaco', de: 'Polnisch', it: 'Polacco', pt: 'Polonês', nl: 'Pools' }, locale: 'pl-PL' },
-  zh: { name: { en: 'Chinese (Mandarin)', fr: 'Chinois (mandarin)', es: 'Chino (mandarín)', de: 'Chinesisch (Mandarin)', it: 'Cinese (mandarino)', pt: 'Chinês (mandarim)', nl: 'Chinees (Mandarijn)' }, locale: 'zh-CN' },
-  ko: { name: { en: 'Korean', fr: 'Coréen', es: 'Coreano', de: 'Koreanisch', it: 'Coreano', pt: 'Coreano', nl: 'Koreaans' }, locale: 'ko-KR' },
-  th: { name: { en: 'Thai', fr: 'Thaï', es: 'Tailandés', de: 'Thailändisch', it: 'Thailandese', pt: 'Tailandês', nl: 'Thai' }, locale: 'th-TH' },
-  id: { name: { en: 'Indonesian', fr: 'Indonésien', es: 'Indonesio', de: 'Indonesisch', it: 'Indonesiano', pt: 'Indonésio', nl: 'Indonesisch' }, locale: 'id-ID' },
+  en: { name: { en: 'English', fr: 'Anglais', es: 'Inglés', de: 'Englisch', it: 'Inglese', pt: 'Inglês', nl: 'Engels', pl: 'Angielski', tr: 'İngilizce', el: 'Αγγλικά', ja: '英語', zh: '英语', ko: '영어', th: 'ภาษาอังกฤษ', id: 'Bahasa Inggris' }, locale: 'en-GB' },
+  fr: { name: { en: 'French', fr: 'Français', es: 'Francés', de: 'Französisch', it: 'Francese', pt: 'Francês', nl: 'Frans', pl: 'Francuski', tr: 'Fransızca', el: 'Γαλλικά', ja: 'フランス語', zh: '法语', ko: '프랑스어', th: 'ภาษาฝรั่งเศส', id: 'Bahasa Prancis' }, locale: 'fr-FR' },
+  es: { name: { en: 'Spanish', fr: 'Espagnol', es: 'Español', de: 'Spanisch', it: 'Spagnolo', pt: 'Espanhol', nl: 'Spaans', pl: 'Hiszpański', tr: 'İspanyolca', el: 'Ισπανικά', ja: 'スペイン語', zh: '西班牙语', ko: '스페인어', th: 'ภาษาสเปน', id: 'Bahasa Spanyol' }, locale: 'es-ES' },
+  it: { name: { en: 'Italian', fr: 'Italien', es: 'Italiano', de: 'Italienisch', it: 'Italiano', pt: 'Italiano', nl: 'Italiaans', pl: 'Włoski', tr: 'İtalyanca', el: 'Ιταλικά', ja: 'イタリア語', zh: '意大利语', ko: '이탈리아어', th: 'ภาษาอิตาลี', id: 'Bahasa Italia' }, locale: 'it-IT' },
+  de: { name: { en: 'German', fr: 'Allemand', es: 'Alemán', de: 'Deutsch', it: 'Tedesco', pt: 'Alemão', nl: 'Duits', pl: 'Niemiecki', tr: 'Almanca', el: 'Γερμανικά', ja: 'ドイツ語', zh: '德语', ko: '독일어', th: 'ภาษาเยอรมัน', id: 'Bahasa Jerman' }, locale: 'de-DE' },
+  pt: { name: { en: 'Portuguese (Brazil)', fr: 'Portugais (Brésil)', es: 'Portugués (Brasil)', de: 'Portugiesisch (Brasilien)', it: 'Portoghese (Brasile)', pt: 'Português (Brasil)', nl: 'Portugees (Brazilië)', pl: 'Portugalski (Brazylia)', tr: 'Portekizce (Brezilya)', el: 'Πορτογαλικά (Βραζιλία)', ja: 'ポルトガル語（ブラジル）', zh: '葡萄牙语（巴西）', ko: '포르투갈어(브라질)', th: 'ภาษาโปรตุเกส (บราซิล)', id: 'Bahasa Portugis (Brasil)' }, locale: 'pt-BR' },
+  'pt-pt': { name: { en: 'Portuguese (Portugal)', fr: 'Portugais (Portugal)', es: 'Portugués (Portugal)', de: 'Portugiesisch (Portugal)', it: 'Portoghese (Portogallo)', pt: 'Português (Portugal)', nl: 'Portugees (Portugal)', pl: 'Portugalski (Portugalia)', tr: 'Portekizce (Portekiz)', el: 'Πορτογαλικά (Πορτογαλία)', ja: 'ポルトガル語（ポルトガル）', zh: '葡萄牙语（葡萄牙）', ko: '포르투갈어(포르투갈)', th: 'ภาษาโปรตุเกส (โปรตุเกส)', id: 'Bahasa Portugis (Portugal)' }, locale: 'pt-PT' },
+  nl: { name: { en: 'Dutch', fr: 'Néerlandais', es: 'Neerlandés', de: 'Niederländisch', it: 'Olandese', pt: 'Holandês', nl: 'Nederlands', pl: 'Niderlandzki', tr: 'Felemenkçe', el: 'Ολλανδικά', ja: 'オランダ語', zh: '荷兰语', ko: '네덜란드어', th: 'ภาษาดัตช์', id: 'Bahasa Belanda' }, locale: 'nl-NL' },
+  ja: { name: { en: 'Japanese', fr: 'Japonais', es: 'Japonés', de: 'Japanisch', it: 'Giapponese', pt: 'Japonês', nl: 'Japans', pl: 'Japoński', tr: 'Japonca', el: 'Ιαπωνικά', ja: '日本語', zh: '日语', ko: '일본어', th: 'ภาษาญี่ปุ่น', id: 'Bahasa Jepang' }, locale: 'ja-JP' },
+  el: { name: { en: 'Greek', fr: 'Grec', es: 'Griego', de: 'Griechisch', it: 'Greco', pt: 'Grego', nl: 'Grieks', pl: 'Grecki', tr: 'Yunanca', el: 'Ελληνικά', ja: 'ギリシャ語', zh: '希腊语', ko: '그리스어', th: 'ภาษากรีก', id: 'Bahasa Yunani' }, locale: 'el-GR' },
+  tr: { name: { en: 'Turkish', fr: 'Turc', es: 'Turco', de: 'Türkisch', it: 'Turco', pt: 'Turco', nl: 'Turks', pl: 'Turecki', tr: 'Türkçe', el: 'Τουρκικά', ja: 'トルコ語', zh: '土耳其语', ko: '튀르키예어', th: 'ภาษาตุรกี', id: 'Bahasa Turki' }, locale: 'tr-TR' },
+  pl: { name: { en: 'Polish', fr: 'Polonais', es: 'Polaco', de: 'Polnisch', it: 'Polacco', pt: 'Polonês', nl: 'Pools', pl: 'Polski', tr: 'Lehçe', el: 'Πολωνικά', ja: 'ポーランド語', zh: '波兰语', ko: '폴란드어', th: 'ภาษาโปแลนด์', id: 'Bahasa Polandia' }, locale: 'pl-PL' },
+  zh: { name: { en: 'Chinese (Mandarin)', fr: 'Chinois (mandarin)', es: 'Chino (mandarín)', de: 'Chinesisch (Mandarin)', it: 'Cinese (mandarino)', pt: 'Chinês (mandarim)', nl: 'Chinees (Mandarijn)', pl: 'Chiński (mandaryński)', tr: 'Çince (Mandarin)', el: 'Κινέζικα (Μανδαρινικά)', ja: '中国語（標準語）', zh: '中文（普通话）', ko: '중국어(표준어)', th: 'ภาษาจีนกลาง', id: 'Bahasa Mandarin' }, locale: 'zh-CN' },
+  ko: { name: { en: 'Korean', fr: 'Coréen', es: 'Coreano', de: 'Koreanisch', it: 'Coreano', pt: 'Coreano', nl: 'Koreaans', pl: 'Koreański', tr: 'Korece', el: 'Κορεατικά', ja: '韓国語', zh: '韩语', ko: '한국어', th: 'ภาษาเกาหลี', id: 'Bahasa Korea' }, locale: 'ko-KR' },
+  th: { name: { en: 'Thai', fr: 'Thaï', es: 'Tailandés', de: 'Thailändisch', it: 'Thailandese', pt: 'Tailandês', nl: 'Thai', pl: 'Tajski', tr: 'Tayca', el: 'Ταϊλανδικά', ja: 'タイ語', zh: '泰语', ko: '태국어', th: 'ภาษาไทย', id: 'Bahasa Thai' }, locale: 'th-TH' },
+  id: { name: { en: 'Indonesian', fr: 'Indonésien', es: 'Indonesio', de: 'Indonesisch', it: 'Indonesiano', pt: 'Indonésio', nl: 'Indonesisch', pl: 'Indonezyjski', tr: 'Endonezce', el: 'Ινδονησιακά', ja: 'インドネシア語', zh: '印尼语', ko: '인도네시아어', th: 'ภาษาอินโดนีเซีย', id: 'Bahasa Indonesia' }, locale: 'id-ID' },
 }
 
-export const HOME_LANGS: HomeLang[] = ['en', 'fr', 'es', 'de', 'it', 'pt', 'nl']
+export const HOME_LANGS: HomeLang[] = ['en', 'fr', 'es', 'de', 'it', 'pt', 'nl', 'pl', 'tr', 'el', 'ja', 'zh', 'ko', 'th', 'id']
 export const MAX_BOARD = 24
 
 // Pronunciation guides are written for English and French readers only.
@@ -40,6 +40,14 @@ const GUIDE_ORDER: Record<HomeLang, HomeLang[]> = {
   pt: ['fr', 'en'],
   de: ['en', 'fr'],
   nl: ['en', 'fr'],
+  pl: ['en', 'fr'],
+  tr: ['en', 'fr'],
+  el: ['en', 'fr'],
+  ja: ['en', 'fr'],
+  zh: ['en', 'fr'],
+  ko: ['en', 'fr'],
+  th: ['en', 'fr'],
+  id: ['en', 'fr'],
 }
 
 export function pronFor(phrase: Phrase, target: Lang, reader: HomeLang): string | undefined {
