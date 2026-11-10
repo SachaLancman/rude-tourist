@@ -16,7 +16,7 @@ export function isLocked(p: Phrase) {
   return !IS_PRO && !isFree(p)
 }
 
-export type Plan = 'trip' | 'year'
+export type Plan = 'trip' | 'year' | 'life'
 
 // Once per app open, a returning user sees the paywall (tip: paywall on every open).
 const SESSION_KEY = 'rude-tourist/paywall-seen'

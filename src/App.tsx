@@ -537,13 +537,13 @@ function deviceHome(): HomeLang {
 
 export default function App() {
   const [settings, setSettings] = useState<Settings | null>(loadSettings)
-  const [screen, setScreen] = useState<Screen>(settings ? 'board' : 'setup')
+  // Every open: intro, then the paywall, then the language picker (pre-filled for returning users).
+  const [screen, setScreen] = useState<Screen>('setup')
   const [open, setOpen] = useState<Phrase | null>(null)
   const [intro, setIntro] = useState(() => !prefersReducedMotion())
   const [skin, setSkin] = useState<Skin>(loadSkin)
   const [picking, setPicking] = useState(false)
-  // Returning users see the paywall once per app open; new users see it right after setup.
-  const [paywall, setPaywall] = useState(() => !!settings && !IS_PRO && !paywallSeenThisOpen())
+  const [paywall, setPaywall] = useState(() => !IS_PRO && !paywallSeenThisOpen())
 
   useEffect(() => {
     if (settings) saveSettings(settings)
@@ -555,9 +555,10 @@ export default function App() {
     if (paywall) markPaywallSeen()
   }, [paywall])
 
-  const introHome: HomeLang = settings?.home ?? deviceHome()
-  const introLayer = intro && <Intro tagline={UI[introHome].tagline} onDone={() => setIntro(false)} />
+  const uiHome: HomeLang = settings?.home ?? deviceHome()
+  const introLayer = intro && <Intro tagline={UI[uiHome].tagline} onDone={() => setIntro(false)} />
   const showPaywall = () => !IS_PRO && setPaywall(true)
+  const paywallLayer = paywall && <Paywall home={uiHome} onClose={() => setPaywall(false)} />
 
   if (!settings || screen === 'setup') {
     return (
@@ -569,9 +570,9 @@ export default function App() {
           onDone={(home, target) => {
             setSettings({ home, target, board: settings?.board ?? DEFAULT_BOARD })
             setScreen('board')
-            if (!settings) showPaywall() // first setup = end of onboarding
           }}
         />
+        {paywallLayer}
         {introLayer}
       </>
     )
@@ -629,7 +630,7 @@ export default function App() {
           </div>
         </div>
       )}
-      {paywall && <Paywall home={settings.home} onClose={() => setPaywall(false)} />}
+      {paywallLayer}
       {introLayer}
     </div>
   )

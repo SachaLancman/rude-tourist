@@ -327,14 +327,14 @@ h2 {
   font-size: 14px;
   font-weight: 700;
 }
-.pw-plans { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 4px; }
+.pw-plans { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 4px; }
 .pw-plan {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 4px;
-  padding: 16px 14px 14px;
+  padding: 16px 10px 12px;
   border: 2px solid var(--line);
   border-radius: 18px;
   background: var(--paper-2);
@@ -346,21 +346,25 @@ h2 {
 .pw-badge {
   position: absolute;
   top: -11px;
-  right: 10px;
-  padding: 2px 9px;
+  left: 50%;
+  max-width: calc(100% + 12px);
+  padding: 2px 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   border: 2px solid var(--hard);
   border-radius: 999px;
   background: var(--butter);
   color: var(--tile-ink);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.04em;
-  transform: rotate(3deg);
+  transform: translateX(-50%) rotate(3deg);
 }
-.pw-plan-name { font-size: 13px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-soft); }
+.pw-plan-name { max-width: 100%; overflow-wrap: anywhere; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-soft); }
 .pw-price { font-size: 14px; color: var(--ink-soft); }
-.pw-price b { font-family: var(--font-display); font-size: 26px; color: var(--ink); font-weight: 600; }
-.pw-note { font-size: 13px; line-height: 1.25; color: var(--ink-soft); }
+.pw-price b { display: block; font-family: var(--font-display); font-size: 22px; color: var(--ink); font-weight: 600; }
+.pw-note { font-size: 12px; line-height: 1.25; color: var(--ink-soft); }
 .pw-cta { width: 100%; padding-block: 18px; font-size: 18px; }
 .pw-fine { margin: -4px 0 0; text-align: center; font-size: 13px; color: var(--ink-soft); }
 .pw-fine.tapped { color: var(--terracotta); font-weight: 600; animation: pick-pop 0.35s var(--spring); }
