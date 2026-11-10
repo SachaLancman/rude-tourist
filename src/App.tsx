@@ -1,10 +1,39 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type CSSProperties } from 'react'
+import { Intro } from './Intro'
+import { Logo } from './Logo'
 import {
   DEFAULT_BOARD, HOME_LANGS, LANGS, MAX_BOARD, PHRASES, PHRASE_BY_ID,
   type Category, type HomeLang, type Lang, type Phrase,
 } from './phrases'
 import { playPhrase, stopSpeaking } from './speech'
 import './App.css'
+
+// Small tilts so board tiles sit like stickers slapped on a suitcase, not a spreadsheet.
+const TILTS = [-1.6, 1.2, -0.8, 1.8, -1.2, 0.9, 1.5, -1.9]
+
+const BURST = {
+  insult: ['⚡', '★', '!', '#', '@', '$', '%', '✱'],
+  basic: ['✓', '✈', '☀', '♥', '★', '✓', '☺', '✱'],
+}
+
+const prefersReducedMotion = () => {
+  try {
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  } catch {
+    return false
+  }
+}
+
+// A short tap on phones that support it (Android). iOS Safari ignores it.
+function buzz() {
+  try {
+    navigator.vibrate?.(10)
+  } catch {
+    // Not supported: silent.
+  }
+}
+
+const style = (vars: Record<string, string | number>) => vars as CSSProperties
 
 interface Settings {
   home: HomeLang
@@ -85,20 +114,27 @@ export default function App() {
   const [settings, setSettings] = useState<Settings | null>(loadSettings)
   const [screen, setScreen] = useState<Screen>(settings ? 'board' : 'setup')
   const [open, setOpen] = useState<Phrase | null>(null)
+  const [intro, setIntro] = useState(() => !prefersReducedMotion())
 
   useEffect(() => {
     if (settings) saveSettings(settings)
   }, [settings])
 
+  const introHome: HomeLang = settings?.home ?? (navigator.language.startsWith('fr') ? 'fr' : 'en')
+  const introLayer = intro && <Intro tagline={UI[introHome].tagline} onDone={() => setIntro(false)} />
+
   if (!settings || screen === 'setup') {
     return (
-      <Setup
-        initial={settings}
-        onDone={(home, target) => {
-          setSettings({ home, target, board: settings?.board ?? DEFAULT_BOARD })
-          setScreen('board')
-        }}
-      />
+      <>
+        <Setup
+          initial={settings}
+          onDone={(home, target) => {
+            setSettings({ home, target, board: settings?.board ?? DEFAULT_BOARD })
+            setScreen('board')
+          }}
+        />
+        {introLayer}
+      </>
     )
   }
 
@@ -124,15 +160,36 @@ export default function App() {
           <button className={screen === 'board' ? 'on' : ''} onClick={() => setScreen('board')}>{t.board}</button>
           <button className={screen === 'library' ? 'on' : ''} onClick={() => setScreen('library')}>{t.library}</button>
         </nav>
+        <Ticker target={settings.target} />
       </header>
 
       {screen === 'board' ? (
-        <Board settings={settings} onOpen={setOpen} onLibrary={() => setScreen('library')} />
+        <Board key="board" settings={settings} onOpen={setOpen} onLibrary={() => setScreen('library')} />
       ) : (
-        <Library settings={settings} onToggle={toggle} />
+        <Library key="library" settings={settings} onToggle={toggle} />
       )}
 
       {open && <PhraseCard phrase={open} settings={settings} onClose={() => { stopSpeaking(); setOpen(null) }} />}
+      {introLayer}
+    </div>
+  )
+}
+
+// What the locals might be shouting at you, scrolling past like a departures board.
+function Ticker({ target }: { target: Lang }) {
+  const lines = PHRASES.filter((p) => p.cat === 'insult').map((p) => p.text[target])
+  const run = lines.map((line, i) => (
+    <span key={i}>
+      {line}
+      <b>✱</b>
+    </span>
+  ))
+  return (
+    <div className="ticker" aria-hidden="true">
+      <div className="ticker-track" lang={LANGS[target].locale}>
+        {run}
+        {run}
+      </div>
     </div>
   )
 }
@@ -146,7 +203,9 @@ function Setup({ initial, onDone }: { initial: Settings | null; onDone: (home: H
   return (
     <div className="app setup">
       <div className="masthead">
-        <img className="logo" src={`${import.meta.env.BASE_URL}logo.svg`} alt="" width="112" height="112" />
+        <div className="logo">
+          <Logo size={112} plate />
+        </div>
         <p className="eyebrow">Phrasebook · Nº 1</p>
         <h1>Rude <em>tourist.</em></h1>
         <p className="tagline">{t.tagline}</p>
@@ -212,9 +271,15 @@ function Board({ settings, onOpen, onLibrary }: { settings: Settings; onOpen: (p
         <button
           key={p.id}
           className={`tile tile-${p.cat} tone-${i % 4}`}
-          onClick={() => onOpen(p)}
+          style={style({ '--i': i, '--tilt': `${TILTS[i % TILTS.length]}deg` })}
+          onClick={() => {
+            buzz()
+            onOpen(p)
+          }}
         >
+          <span className="tile-mark" aria-hidden="true">{p.cat === 'insult' ? '#@!' : '✓'}</span>
           <span className="tile-text">{p.text[settings.home]}</span>
+          <span className="tile-target" lang={LANGS[settings.target].locale}>{p.text[settings.target]}</span>
         </button>
       ))}
     </main>
@@ -235,10 +300,10 @@ function Library({ settings, onToggle }: { settings: Settings; onToggle: (id: st
       </div>
       <p className="count">{settings.board.length} / {MAX_BOARD}{full ? ` · ${t.full}` : ''}</p>
       <ul>
-        {PHRASES.filter((p) => p.cat === cat).map((p) => {
+        {PHRASES.filter((p) => p.cat === cat).map((p, i) => {
           const on = settings.board.includes(p.id)
           return (
-            <li key={p.id}>
+            <li key={`${cat}-${p.id}`} style={style({ '--i': i })}>
               <div className="lib-text">
                 <span>{p.text[settings.home]}</span>
                 <span className="lib-target">{p.text[settings.target]}</span>
@@ -246,7 +311,10 @@ function Library({ settings, onToggle }: { settings: Settings; onToggle: (id: st
               <button
                 className={`lib-btn ${on ? 'on' : ''}`}
                 disabled={!on && full}
-                onClick={() => onToggle(p.id)}
+                onClick={() => {
+                  buzz()
+                  onToggle(p.id)
+                }}
                 aria-label={on ? t.remove : t.add}
               >
                 {on ? '✓' : '+'}
@@ -263,8 +331,16 @@ function PhraseCard({ phrase, settings, onClose }: { phrase: Phrase; settings: S
   const t = UI[settings.home]
   const target = settings.target
   const [silent, setSilent] = useState(false)
+  const [speaking, setSpeaking] = useState(false)
   const pron = phrase.pron[target][settings.home]
-  const play = (rate = 1) => playPhrase(phrase, target, rate).then((ok) => setSilent(!ok))
+  const play = (rate = 1) => {
+    setSpeaking(true)
+    playPhrase(phrase, target, rate, () => setSpeaking(false)).then((ok) => {
+      setSilent(!ok)
+      if (!ok) setSpeaking(false)
+    })
+  }
+  const words = phrase.text[target].split(' ')
 
   // Speak as soon as the card opens.
   useEffect(() => {
@@ -281,9 +357,22 @@ function PhraseCard({ phrase, settings, onClose }: { phrase: Phrase; settings: S
   return (
     <div className="overlay" onClick={onClose}>
       <div className="card" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
+        <div className="burst" aria-hidden="true">
+          {BURST[phrase.cat].map((sym, i) => (
+            <span key={i} style={style({ '--a': `${(360 / BURST[phrase.cat].length) * i - 90}deg`, '--i': i })}>
+              {sym}
+            </span>
+          ))}
+        </div>
         <button className="close" onClick={onClose} aria-label="Close">×</button>
         <p className="card-home">{LANGS[settings.home].flag} {phrase.text[settings.home]}</p>
-        <p className="card-target" lang={LANGS[target].locale}>{phrase.text[target]}</p>
+        <p className="card-target" lang={LANGS[target].locale} aria-label={phrase.text[target]}>
+          {words.map((w, i) => (
+            <span key={i} className="word" style={style({ '--i': i })} aria-hidden="true">
+              {w}{i < words.length - 1 ? ' ' : ''}
+            </span>
+          ))}
+        </p>
         {pron && (
           <div className="card-pron">
             <span className="label">{t.soundsLike}</span>
@@ -292,7 +381,10 @@ function PhraseCard({ phrase, settings, onClose }: { phrase: Phrase; settings: S
         )}
         {silent && <p className="warn">{t.noVoice}</p>}
         <div className="card-actions">
-          <button className="primary" onClick={() => play()}>🔊 {t.sayIt}</button>
+          <button className={`primary say${speaking ? ' speaking' : ''}`} onClick={() => play()}>
+            <span className="bars" aria-hidden="true"><i /><i /><i /><i /></span>
+            {t.sayIt}
+          </button>
           <button className="secondary" onClick={() => play(0.7)}>🐢 {t.slow}</button>
         </div>
       </div>
