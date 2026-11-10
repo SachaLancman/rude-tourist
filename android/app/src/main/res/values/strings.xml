@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Rude Tourist</string>
+    <string name="title_activity_main">Rude Tourist</string>
+    <string name="package_name">io.github.sachalancman.rudetourist</string>
+    <string name="custom_url_scheme">io.github.sachalancman.rudetourist</string>
+</resources>

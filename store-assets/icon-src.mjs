@@ -1,19 +1,22 @@
-// Writes the store icon SVGs (full-bleed squares: the stores round the corners themselves).
-// Run: node store-assets/icon-src.mjs, then render each SVG to PNG.
-import { writeFileSync } from 'node:fs'
+// Writes the icon and splash SVGs from the logo artwork (public/logo.svg).
+// Run: node store-assets/icon-src.mjs, then render each SVG to PNG (see README).
+// Store icons are full-bleed squares: the stores round the corners themselves.
+// assets/ holds the Android/iOS sources that `npx @capacitor/assets generate` turns into app icons.
+import { mkdirSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const here = dirname(fileURLToPath(import.meta.url))
-const variants = {
+const appAssets = join(here, '..', 'assets')
+mkdirSync(appAssets, { recursive: true })
+
+const COLORS = {
   cream: { bg: '#f6efe3', bubble: '#d9774f', sym: '#fff8f0' },
   terracotta: { bg: '#d9774f', bubble: '#fff8f0', sym: '#d9774f' },
 }
-for (const [name, c] of Object.entries(variants)) {
-  // Logo artwork from public/logo.svg, scaled and centred so the store masks never clip the tag.
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
-  <rect width="1024" height="1024" fill="${c.bg}"/>
-  <g transform="translate(86 121) scale(1.55)">
+
+// The logo drawing in its own 512-unit space; `transform` places it.
+const art = (c, transform) => `  <g transform="${transform}">
     <g transform="translate(10 12)" fill="#2b2420">
       <rect x="56" y="104" width="400" height="272" rx="96"/>
       <path d="M118 330 L88 452 L224 362 Z"/>
@@ -35,9 +38,28 @@ for (const [name, c] of Object.entries(variants)) {
       <rect x="420" y="84" width="54" height="8" rx="4" fill="#2b2420" opacity="0.35"/>
       <rect x="420" y="104" width="36" height="8" rx="4" fill="#2b2420" opacity="0.35"/>
     </g>
-  </g>
+  </g>`
+
+// The drawing spans about x 56-495, y 40-464; this centres it at (cx, cy) at `width` pixels wide.
+const place = (cx, cy, width) => {
+  const k = width / 440
+  return `translate(${(cx - 275 * k).toFixed(1)} ${(cy - 252 * k).toFixed(1)}) scale(${k.toFixed(4)})`
+}
+const svg = (size, body, bg) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">
+${bg ? `  <rect width="${size}" height="${size}" fill="${bg}"/>\n` : ''}${body}
 </svg>
 `
-  writeFileSync(join(here, `icon-${name}.svg`), svg)
+
+for (const [name, c] of Object.entries(COLORS)) {
+  writeFileSync(join(here, `icon-${name}.svg`), svg(1024, art(c, place(512, 512, 682)), c.bg))
 }
+
+// Android adaptive icon: the drawing stays inside the 66% safe zone, on a flat terracotta layer.
+const t = COLORS.terracotta
+writeFileSync(join(appAssets, 'icon-only.svg'), svg(1024, art(t, place(512, 512, 682)), t.bg))
+writeFileSync(join(appAssets, 'icon-foreground.svg'), svg(1024, art(t, place(512, 512, 560))))
+writeFileSync(join(appAssets, 'icon-background.svg'), svg(1024, '', t.bg))
+// Splash: the cream logo on the app's paper colour, light and dark.
+writeFileSync(join(appAssets, 'splash.svg'), svg(2732, art(COLORS.cream, place(1366, 1366, 900)), '#f6efe3'))
+writeFileSync(join(appAssets, 'splash-dark.svg'), svg(2732, art(COLORS.cream, place(1366, 1366, 900)), '#221d1a'))
 console.log('ok')
