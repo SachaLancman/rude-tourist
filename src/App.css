@@ -107,6 +107,8 @@ h2 {
   font-size: 17px;
   font-weight: 600;
 }
+.credit { margin: 0; text-align: center; font-size: 13px; color: var(--ink-soft); }
+.credit a { color: inherit; }
 .primary { background: var(--terracotta); color: #fff8f0; box-shadow: var(--shadow); }
 .secondary { border: 1.5px solid var(--line); }
 

@@ -184,6 +184,11 @@ function Setup({ initial, onDone }: { initial: Settings | null; onDone: (home: H
       <button className="primary" disabled={!target} onClick={() => target && onDone(home, target)}>
         {t.start}
       </button>
+
+      {/* Required while the clips come from the ElevenLabs free plan. */}
+      <p className="credit">
+        Voices by <a href="https://elevenlabs.io" target="_blank" rel="noreferrer">ElevenLabs</a>
+      </p>
     </div>
   )
 }
