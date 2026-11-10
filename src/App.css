@@ -27,6 +27,17 @@
     color-scheme: dark;
   }
 }
+/* Same dark values for an explicit dark choice by the host page. */
+:root[data-theme='dark'] {
+  --paper: #221d1a;
+  --paper-2: #2c2622;
+  --ink: #f3eadc;
+  --ink-soft: #b5a899;
+  --line: #443b34;
+  --terracotta: #e48b63;
+  --shadow: 0 8px 24px -12px rgba(0, 0, 0, 0.6);
+  color-scheme: dark;
+}
 
 * { box-sizing: border-box; }
 
@@ -115,7 +126,7 @@ h2 {
 /* Header */
 .top {
   position: sticky;
-  top: 0;
+  top: env(safe-area-inset-top, 0px);
   z-index: 2;
   display: flex;
   flex-direction: column;
