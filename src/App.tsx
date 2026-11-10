@@ -4,7 +4,7 @@ import { Logo } from './Logo'
 import { Paywall } from './Paywall'
 import { IS_PRO, isLocked, markPaywallSeen, paywallSeenThisOpen } from './pro'
 import {
-  CATEGORIES, DEFAULT_BOARD, HOME_LANGS, LANGS, MAX_BOARD, PHRASES, PHRASE_BY_ID,
+  CATEGORIES, DEFAULT_BOARD, HOME_LANGS, LANGS, MAX_BOARD, PHRASES, PHRASE_BY_ID, pronFor,
   type Category, type HomeLang, type Lang, type Phrase,
 } from './phrases'
 import { SKINS, applySkin, loadSkin, type Skin } from './skins'
@@ -131,9 +131,160 @@ const UI = {
     noVoice: "Pas de voix pour cette langue sur ton appareil. Montre l'écran à la place.",
     change: 'Changer',
   },
+  es: {
+    tagline: 'Dilo como un local.',
+    iSpeak: 'Hablo',
+    goingTo: 'Quiero hablar',
+    start: 'Abrir mi tablero',
+    board: 'Mi tablero',
+    library: 'Biblioteca',
+    edit: 'Editar',
+    done: 'Listo',
+    empty: 'Tu tablero está vacío. Añade frases desde la biblioteca.',
+    insult: 'Insultos',
+    basic: 'Supervivencia',
+    taxi: 'Taxi',
+    food: 'Restaurante',
+    night: 'Fiesta',
+    look: 'Estilo',
+    add: 'Añadir',
+    remove: 'Quitar',
+    full: `Tablero lleno (${MAX_BOARD} máx.)`,
+    sayIt: 'Decirlo',
+    slow: 'Despacio',
+    practice: 'Practicar',
+    listen: 'Escucha…',
+    yourTurn: '¡Tu turno!',
+    stop: 'Parar',
+    soundsLike: 'Suena como',
+    noVoice: 'No hay voz para este idioma en tu dispositivo. Enseña la pantalla.',
+    change: 'Cambiar',
+  },
+  de: {
+    tagline: 'Sag es wie ein Einheimischer.',
+    iSpeak: 'Ich spreche',
+    goingTo: 'Ich will sprechen',
+    start: 'Meine Tafel öffnen',
+    board: 'Meine Tafel',
+    library: 'Bibliothek',
+    edit: 'Bearbeiten',
+    done: 'Fertig',
+    empty: 'Deine Tafel ist leer. Füge Sätze aus der Bibliothek hinzu.',
+    insult: 'Beleidigungen',
+    basic: 'Überleben',
+    taxi: 'Taxi',
+    food: 'Restaurant',
+    night: 'Nachtleben',
+    look: 'Stil',
+    add: 'Hinzufügen',
+    remove: 'Entfernen',
+    full: `Tafel voll (max. ${MAX_BOARD})`,
+    sayIt: 'Sagen',
+    slow: 'Langsam',
+    practice: 'Üben',
+    listen: 'Hör zu…',
+    yourTurn: 'Du bist dran!',
+    stop: 'Stopp',
+    soundsLike: 'Klingt wie',
+    noVoice: 'Keine Stimme für diese Sprache auf deinem Gerät. Zeig einfach den Bildschirm.',
+    change: 'Ändern',
+  },
+  it: {
+    tagline: 'Dillo come un locale.',
+    iSpeak: 'Parlo',
+    goingTo: 'Voglio parlare',
+    start: 'Apri la mia bacheca',
+    board: 'La mia bacheca',
+    library: 'Libreria',
+    edit: 'Modifica',
+    done: 'Fatto',
+    empty: 'La tua bacheca è vuota. Aggiungi frasi dalla libreria.',
+    insult: 'Insulti',
+    basic: 'Sopravvivenza',
+    taxi: 'Taxi',
+    food: 'Ristorante',
+    night: 'Vita notturna',
+    look: 'Stile',
+    add: 'Aggiungi',
+    remove: 'Rimuovi',
+    full: `Bacheca piena (max ${MAX_BOARD})`,
+    sayIt: 'Dillo',
+    slow: 'Piano',
+    practice: 'Esercizio',
+    listen: 'Ascolta…',
+    yourTurn: 'Tocca a te!',
+    stop: 'Stop',
+    soundsLike: 'Si pronuncia',
+    noVoice: 'Nessuna voce per questa lingua sul tuo dispositivo. Mostra lo schermo.',
+    change: 'Cambia',
+  },
+  pt: {
+    tagline: 'Fale como um local.',
+    iSpeak: 'Eu falo',
+    goingTo: 'Quero falar',
+    start: 'Abrir meu quadro',
+    board: 'Meu quadro',
+    library: 'Biblioteca',
+    edit: 'Editar',
+    done: 'Pronto',
+    empty: 'Seu quadro está vazio. Adicione frases da biblioteca.',
+    insult: 'Insultos',
+    basic: 'Sobrevivência',
+    taxi: 'Táxi',
+    food: 'Restaurante',
+    night: 'Balada',
+    look: 'Estilo',
+    add: 'Adicionar',
+    remove: 'Remover',
+    full: `Quadro cheio (máx. ${MAX_BOARD})`,
+    sayIt: 'Falar',
+    slow: 'Devagar',
+    practice: 'Praticar',
+    listen: 'Escute…',
+    yourTurn: 'Sua vez!',
+    stop: 'Parar',
+    soundsLike: 'Soa como',
+    noVoice: 'Sem voz para este idioma no seu aparelho. Mostre a tela.',
+    change: 'Mudar',
+  },
+  nl: {
+    tagline: 'Zeg het als een local.',
+    iSpeak: 'Ik spreek',
+    goingTo: 'Ik wil spreken',
+    start: 'Open mijn bord',
+    board: 'Mijn bord',
+    library: 'Bibliotheek',
+    edit: 'Bewerken',
+    done: 'Klaar',
+    empty: 'Je bord is leeg. Voeg zinnen toe uit de bibliotheek.',
+    insult: 'Scheldwoorden',
+    basic: 'Overleven',
+    taxi: 'Taxi',
+    food: 'Restaurant',
+    night: 'Uitgaan',
+    look: 'Stijl',
+    add: 'Toevoegen',
+    remove: 'Verwijderen',
+    full: `Bord vol (max. ${MAX_BOARD})`,
+    sayIt: 'Zeg het',
+    slow: 'Langzaam',
+    practice: 'Oefenen',
+    listen: 'Luister…',
+    yourTurn: 'Jouw beurt!',
+    stop: 'Stop',
+    soundsLike: 'Klinkt als',
+    noVoice: 'Geen stem voor deze taal op je toestel. Laat het scherm zien.',
+    change: 'Wijzigen',
+  },
 } satisfies Record<HomeLang, Record<string, string>>
 
 type Screen = 'setup' | 'board' | 'library'
+
+// The device language when the app speaks it, else English.
+function deviceHome(): HomeLang {
+  const code = navigator.language.slice(0, 2) as HomeLang
+  return HOME_LANGS.includes(code) ? code : 'en'
+}
 
 export default function App() {
   const [settings, setSettings] = useState<Settings | null>(loadSettings)
@@ -155,7 +306,7 @@ export default function App() {
     if (paywall) markPaywallSeen()
   }, [paywall])
 
-  const introHome: HomeLang = settings?.home ?? (navigator.language.startsWith('fr') ? 'fr' : 'en')
+  const introHome: HomeLang = settings?.home ?? deviceHome()
   const introLayer = intro && <Intro tagline={UI[introHome].tagline} onDone={() => setIntro(false)} />
   const showPaywall = () => !IS_PRO && setPaywall(true)
 
@@ -294,7 +445,7 @@ function Setup({ initial, skin, onSkin, onDone }: {
   onSkin: (s: Skin) => void
   onDone: (home: HomeLang, target: Lang) => void
 }) {
-  const [home, setHome] = useState<HomeLang>(initial?.home ?? (navigator.language.startsWith('fr') ? 'fr' : 'en'))
+  const [home, setHome] = useState<HomeLang>(initial?.home ?? deviceHome())
   const [target, setTarget] = useState<Lang | null>(initial?.target ?? null)
   const t = UI[home]
   const targets = (Object.keys(LANGS) as Lang[]).filter((l) => l !== home)
@@ -312,7 +463,7 @@ function Setup({ initial, skin, onSkin, onDone }: {
 
       <section>
         <h2>{t.iSpeak}</h2>
-        <div className="pick-row">
+        <div className="pick-grid">
           {HOME_LANGS.map((l) => (
             <button
               key={l}
@@ -458,7 +609,7 @@ function PhraseCard({ phrase, settings, onLocked, onClose }: {
   const [speaking, setSpeaking] = useState(false)
   const [drill, setDrill] = useState<Drill | null>(null)
   const gap = useRef<number | undefined>(undefined)
-  const pron = phrase.pron[target][settings.home]
+  const pron = pronFor(phrase, target, settings.home)
 
   const stopDrill = () => {
     window.clearTimeout(gap.current)

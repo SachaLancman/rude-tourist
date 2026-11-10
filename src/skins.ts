@@ -5,10 +5,10 @@ import type { HomeLang } from './phrases'
 export type Skin = 'postcard' | 'neon' | 'tabloid' | 'riviera'
 
 export const SKINS: { id: Skin; name: Record<HomeLang, string>; swatch: string[] }[] = [
-  { id: 'postcard', name: { en: 'Postcard', fr: 'Carte postale' }, swatch: ['#f6efe3', '#d9774f', '#a9bb9a', '#f1d38a'] },
-  { id: 'neon', name: { en: 'Neon Night', fr: 'Nuit néon' }, swatch: ['#15102a', '#ff4fa3', '#3ee6e0', '#c6f45b'] },
-  { id: 'tabloid', name: { en: 'Tabloid', fr: 'Tabloïd' }, swatch: ['#f1efe8', '#e10600', '#ffe14d', '#111111'] },
-  { id: 'riviera', name: { en: 'Riviera', fr: 'Riviera' }, swatch: ['#fbfaf5', '#1f5fd1', '#9fd3f5', '#ffe36b'] },
+  { id: 'postcard', name: { en: 'Postcard', fr: 'Carte postale', es: 'Postal', de: 'Postkarte', it: 'Cartolina', pt: 'Cartão-postal', nl: 'Ansichtkaart' }, swatch: ['#f6efe3', '#d9774f', '#a9bb9a', '#f1d38a'] },
+  { id: 'neon', name: { en: 'Neon Night', fr: 'Nuit néon', es: 'Noche neón', de: 'Neonnacht', it: 'Notte al neon', pt: 'Noite neon', nl: 'Neonnacht' }, swatch: ['#15102a', '#ff4fa3', '#3ee6e0', '#c6f45b'] },
+  { id: 'tabloid', name: { en: 'Tabloid', fr: 'Tabloïd', es: 'Tabloide', de: 'Boulevard', it: 'Tabloid', pt: 'Tabloide', nl: 'Roddelblad' }, swatch: ['#f1efe8', '#e10600', '#ffe14d', '#111111'] },
+  { id: 'riviera', name: { en: 'Riviera', fr: 'Riviera', es: 'Riviera', de: 'Riviera', it: 'Riviera', pt: 'Riviera', nl: 'Riviera' }, swatch: ['#fbfaf5', '#1f5fd1', '#9fd3f5', '#ffe36b'] },
 ]
 
 const KEY = 'rude-tourist/skin'
