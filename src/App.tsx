@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
+import { Flag } from './Flag'
 import { Intro } from './Intro'
+import { LangSelect } from './LangSelect'
 import { Logo } from './Logo'
 import { Paywall } from './Paywall'
 import { IS_PRO, isLocked, markPaywallSeen, paywallSeenThisOpen } from './pro'
@@ -101,6 +103,7 @@ const UI = {
     soundsLike: 'Sounds like',
     noVoice: 'No voice for this language on your device. Show the screen instead.',
     change: 'Change',
+    choose: 'Choose a language',
   },
   fr: {
     tagline: 'Parle comme un local.',
@@ -130,6 +133,7 @@ const UI = {
     soundsLike: 'Se prononce',
     noVoice: "Pas de voix pour cette langue sur ton appareil. Montre l'écran à la place.",
     change: 'Changer',
+    choose: 'Choisis une langue',
   },
   es: {
     tagline: 'Dilo como un local.',
@@ -159,6 +163,7 @@ const UI = {
     soundsLike: 'Suena como',
     noVoice: 'No hay voz para este idioma en tu dispositivo. Enseña la pantalla.',
     change: 'Cambiar',
+    choose: 'Elige un idioma',
   },
   de: {
     tagline: 'Sag es wie ein Einheimischer.',
@@ -188,6 +193,7 @@ const UI = {
     soundsLike: 'Klingt wie',
     noVoice: 'Keine Stimme für diese Sprache auf deinem Gerät. Zeig einfach den Bildschirm.',
     change: 'Ändern',
+    choose: 'Sprache wählen',
   },
   it: {
     tagline: 'Dillo come un locale.',
@@ -217,6 +223,7 @@ const UI = {
     soundsLike: 'Si pronuncia',
     noVoice: 'Nessuna voce per questa lingua sul tuo dispositivo. Mostra lo schermo.',
     change: 'Cambia',
+    choose: 'Scegli una lingua',
   },
   pt: {
     tagline: 'Fale como um local.',
@@ -246,6 +253,7 @@ const UI = {
     soundsLike: 'Soa como',
     noVoice: 'Sem voz para este idioma no seu aparelho. Mostre a tela.',
     change: 'Mudar',
+    choose: 'Escolha um idioma',
   },
   nl: {
     tagline: 'Zeg het als een local.',
@@ -275,6 +283,7 @@ const UI = {
     soundsLike: 'Klinkt als',
     noVoice: 'Geen stem voor deze taal op je toestel. Laat het scherm zien.',
     change: 'Wijzigen',
+    choose: 'Kies een taal',
   },
 } satisfies Record<HomeLang, Record<string, string>>
 
@@ -342,9 +351,9 @@ export default function App() {
       <header className="top">
         <div className="top-row">
           <button className="lang-chip" onClick={() => setScreen('setup')} aria-label={t.change}>
-            <span>{LANGS[settings.home].flag}</span>
+            <Flag lang={settings.home} size={20} />
             <span className="arrow">→</span>
-            <span>{LANGS[settings.target].flag}</span>
+            <Flag lang={settings.target} size={20} />
             <span className="lang-chip-name">{LANGS[settings.target].name[settings.home]}</span>
           </button>
           <button className="look-btn" onClick={() => setPicking(true)} aria-label={t.look}>
@@ -463,31 +472,29 @@ function Setup({ initial, skin, onSkin, onDone }: {
 
       <section>
         <h2>{t.iSpeak}</h2>
-        <div className="pick-grid">
-          {HOME_LANGS.map((l) => (
-            <button
-              key={l}
-              className={`pick ${home === l ? 'on' : ''}`}
-              onClick={() => {
-                setHome(l)
-                if (target === l) setTarget(null)
-              }}
-            >
-              <span className="flag">{LANGS[l].flag}</span>{LANGS[l].name[l]}
-            </button>
-          ))}
-        </div>
+        <LangSelect
+          label={t.iSpeak}
+          value={home}
+          options={HOME_LANGS}
+          nameOf={(l) => LANGS[l].name[l]}
+          placeholder={t.choose}
+          onChange={(l) => {
+            setHome(l)
+            if (target === l) setTarget(null)
+          }}
+        />
       </section>
 
       <section>
         <h2>{t.goingTo}</h2>
-        <div className="pick-grid">
-          {targets.map((l) => (
-            <button key={l} className={`pick ${target === l ? 'on' : ''}`} onClick={() => setTarget(l)}>
-              <span className="flag">{LANGS[l].flag}</span>{LANGS[l].name[home]}
-            </button>
-          ))}
-        </div>
+        <LangSelect
+          label={t.goingTo}
+          value={target}
+          options={targets}
+          nameOf={(l) => LANGS[l].name[home]}
+          placeholder={t.choose}
+          onChange={setTarget}
+        />
       </section>
 
       <section>
@@ -684,7 +691,7 @@ function PhraseCard({ phrase, settings, onLocked, onClose }: {
           ))}
         </div>
         <button className="close" onClick={onClose} aria-label="Close">×</button>
-        <p className="card-home">{LANGS[settings.home].flag} {phrase.text[settings.home]}</p>
+        <p className="card-home"><Flag lang={settings.home} size={18} /> {phrase.text[settings.home]}</p>
         <p className="card-target" lang={LANGS[target].locale} aria-label={phrase.text[target]}>
           {words.map((w, i) => (
             <span key={i} className="word" style={style({ '--i': i })} aria-hidden="true">

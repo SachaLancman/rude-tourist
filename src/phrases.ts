@@ -8,22 +8,22 @@ export type HomeLang = 'en' | 'fr' | 'es' | 'de' | 'it' | 'pt' | 'nl'
 export type Category = 'insult' | 'basic' | 'taxi' | 'food' | 'night'
 export const CATEGORIES: Category[] = ['insult', 'basic', 'taxi', 'food', 'night']
 
-export const LANGS: Record<Lang, { name: Record<HomeLang, string>; flag: string; locale: string }> = {
-  en: { name: { en: 'English', fr: 'Anglais', es: 'Inglés', de: 'Englisch', it: 'Inglese', pt: 'Inglês', nl: 'Engels' }, flag: '🇬🇧', locale: 'en-GB' },
-  fr: { name: { en: 'French', fr: 'Français', es: 'Francés', de: 'Französisch', it: 'Francese', pt: 'Francês', nl: 'Frans' }, flag: '🇫🇷', locale: 'fr-FR' },
-  es: { name: { en: 'Spanish', fr: 'Espagnol', es: 'Español', de: 'Spanisch', it: 'Spagnolo', pt: 'Espanhol', nl: 'Spaans' }, flag: '🇪🇸', locale: 'es-ES' },
-  it: { name: { en: 'Italian', fr: 'Italien', es: 'Italiano', de: 'Italienisch', it: 'Italiano', pt: 'Italiano', nl: 'Italiaans' }, flag: '🇮🇹', locale: 'it-IT' },
-  de: { name: { en: 'German', fr: 'Allemand', es: 'Alemán', de: 'Deutsch', it: 'Tedesco', pt: 'Alemão', nl: 'Duits' }, flag: '🇩🇪', locale: 'de-DE' },
-  pt: { name: { en: 'Portuguese (Brazil)', fr: 'Portugais (Brésil)', es: 'Portugués (Brasil)', de: 'Portugiesisch (Brasilien)', it: 'Portoghese (Brasile)', pt: 'Português (Brasil)', nl: 'Portugees (Brazilië)' }, flag: '🇧🇷', locale: 'pt-BR' },
-  nl: { name: { en: 'Dutch', fr: 'Néerlandais', es: 'Neerlandés', de: 'Niederländisch', it: 'Olandese', pt: 'Holandês', nl: 'Nederlands' }, flag: '🇳🇱', locale: 'nl-NL' },
-  ja: { name: { en: 'Japanese', fr: 'Japonais', es: 'Japonés', de: 'Japanisch', it: 'Giapponese', pt: 'Japonês', nl: 'Japans' }, flag: '🇯🇵', locale: 'ja-JP' },
-  el: { name: { en: 'Greek', fr: 'Grec', es: 'Griego', de: 'Griechisch', it: 'Greco', pt: 'Grego', nl: 'Grieks' }, flag: '🇬🇷', locale: 'el-GR' },
-  tr: { name: { en: 'Turkish', fr: 'Turc', es: 'Turco', de: 'Türkisch', it: 'Turco', pt: 'Turco', nl: 'Turks' }, flag: '🇹🇷', locale: 'tr-TR' },
-  pl: { name: { en: 'Polish', fr: 'Polonais', es: 'Polaco', de: 'Polnisch', it: 'Polacco', pt: 'Polonês', nl: 'Pools' }, flag: '🇵🇱', locale: 'pl-PL' },
-  zh: { name: { en: 'Chinese (Mandarin)', fr: 'Chinois (mandarin)', es: 'Chino (mandarín)', de: 'Chinesisch (Mandarin)', it: 'Cinese (mandarino)', pt: 'Chinês (mandarim)', nl: 'Chinees (Mandarijn)' }, flag: '🇨🇳', locale: 'zh-CN' },
-  ko: { name: { en: 'Korean', fr: 'Coréen', es: 'Coreano', de: 'Koreanisch', it: 'Coreano', pt: 'Coreano', nl: 'Koreaans' }, flag: '🇰🇷', locale: 'ko-KR' },
-  th: { name: { en: 'Thai', fr: 'Thaï', es: 'Tailandés', de: 'Thailändisch', it: 'Thailandese', pt: 'Tailandês', nl: 'Thai' }, flag: '🇹🇭', locale: 'th-TH' },
-  id: { name: { en: 'Indonesian', fr: 'Indonésien', es: 'Indonesio', de: 'Indonesisch', it: 'Indonesiano', pt: 'Indonésio', nl: 'Indonesisch' }, flag: '🇮🇩', locale: 'id-ID' },
+export const LANGS: Record<Lang, { name: Record<HomeLang, string>; locale: string }> = {
+  en: { name: { en: 'English', fr: 'Anglais', es: 'Inglés', de: 'Englisch', it: 'Inglese', pt: 'Inglês', nl: 'Engels' }, locale: 'en-GB' },
+  fr: { name: { en: 'French', fr: 'Français', es: 'Francés', de: 'Französisch', it: 'Francese', pt: 'Francês', nl: 'Frans' }, locale: 'fr-FR' },
+  es: { name: { en: 'Spanish', fr: 'Espagnol', es: 'Español', de: 'Spanisch', it: 'Spagnolo', pt: 'Espanhol', nl: 'Spaans' }, locale: 'es-ES' },
+  it: { name: { en: 'Italian', fr: 'Italien', es: 'Italiano', de: 'Italienisch', it: 'Italiano', pt: 'Italiano', nl: 'Italiaans' }, locale: 'it-IT' },
+  de: { name: { en: 'German', fr: 'Allemand', es: 'Alemán', de: 'Deutsch', it: 'Tedesco', pt: 'Alemão', nl: 'Duits' }, locale: 'de-DE' },
+  pt: { name: { en: 'Portuguese (Brazil)', fr: 'Portugais (Brésil)', es: 'Portugués (Brasil)', de: 'Portugiesisch (Brasilien)', it: 'Portoghese (Brasile)', pt: 'Português (Brasil)', nl: 'Portugees (Brazilië)' }, locale: 'pt-BR' },
+  nl: { name: { en: 'Dutch', fr: 'Néerlandais', es: 'Neerlandés', de: 'Niederländisch', it: 'Olandese', pt: 'Holandês', nl: 'Nederlands' }, locale: 'nl-NL' },
+  ja: { name: { en: 'Japanese', fr: 'Japonais', es: 'Japonés', de: 'Japanisch', it: 'Giapponese', pt: 'Japonês', nl: 'Japans' }, locale: 'ja-JP' },
+  el: { name: { en: 'Greek', fr: 'Grec', es: 'Griego', de: 'Griechisch', it: 'Greco', pt: 'Grego', nl: 'Grieks' }, locale: 'el-GR' },
+  tr: { name: { en: 'Turkish', fr: 'Turc', es: 'Turco', de: 'Türkisch', it: 'Turco', pt: 'Turco', nl: 'Turks' }, locale: 'tr-TR' },
+  pl: { name: { en: 'Polish', fr: 'Polonais', es: 'Polaco', de: 'Polnisch', it: 'Polacco', pt: 'Polonês', nl: 'Pools' }, locale: 'pl-PL' },
+  zh: { name: { en: 'Chinese (Mandarin)', fr: 'Chinois (mandarin)', es: 'Chino (mandarín)', de: 'Chinesisch (Mandarin)', it: 'Cinese (mandarino)', pt: 'Chinês (mandarim)', nl: 'Chinees (Mandarijn)' }, locale: 'zh-CN' },
+  ko: { name: { en: 'Korean', fr: 'Coréen', es: 'Coreano', de: 'Koreanisch', it: 'Coreano', pt: 'Coreano', nl: 'Koreaans' }, locale: 'ko-KR' },
+  th: { name: { en: 'Thai', fr: 'Thaï', es: 'Tailandés', de: 'Thailändisch', it: 'Thailandese', pt: 'Tailandês', nl: 'Thai' }, locale: 'th-TH' },
+  id: { name: { en: 'Indonesian', fr: 'Indonésien', es: 'Indonesio', de: 'Indonesisch', it: 'Indonesiano', pt: 'Indonésio', nl: 'Indonesisch' }, locale: 'id-ID' },
 }
 
 export const HOME_LANGS: HomeLang[] = ['en', 'fr', 'es', 'de', 'it', 'pt', 'nl']

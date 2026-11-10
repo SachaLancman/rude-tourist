@@ -203,7 +203,67 @@ h2 {
   transition: border-color 0.15s, background 0.15s;
 }
 .pick.on { border-color: var(--ink); background: var(--ink); color: var(--paper); }
-.flag { font-size: 22px; line-height: 1; }
+.flag {
+  flex: none;
+  display: block;
+  border-radius: 3px;
+  object-fit: cover;
+  box-shadow: 0 0 0 1px rgba(43, 36, 32, 0.18);
+}
+.card-home .flag { display: inline-block; vertical-align: -2px; margin-right: 4px; }
+
+/* Language dropdowns on the setup screen */
+.select {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 18px;
+  border: 1.5px solid var(--hard);
+  border-radius: 16px;
+  background: var(--card, var(--paper));
+  box-shadow: 3px 3px 0 var(--hard);
+  font-size: 18px;
+  font-weight: 600;
+  text-align: left;
+  transition: transform 0.15s var(--spring), box-shadow 0.15s;
+}
+.select:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--hard); }
+.select.unset { color: var(--ink-soft); font-weight: 500; font-style: italic; }
+.select-name { flex: 1; min-width: 0; }
+.select-chevron { color: var(--ink-soft); font-size: 14px; }
+.sheet {
+  width: 100%;
+  max-width: 560px;
+  max-height: 78vh;
+  display: flex;
+  flex-direction: column;
+  padding: 18px 12px calc(12px + env(safe-area-inset-bottom, 0px));
+  background: var(--paper);
+  border-radius: 28px 28px 0 0;
+  animation: rise 0.32s var(--spring);
+}
+.sheet-title {
+  margin: 0 10px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.sheet-list { list-style: none; margin: 0; padding: 0; overflow-y: auto; }
+.sheet-list button {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 13px 12px;
+  border-radius: 14px;
+  font-size: 17px;
+  text-align: left;
+}
+.sheet-list button.on { background: var(--ink); color: var(--paper); }
+.sheet-check { font-weight: 700; }
 
 .primary, .secondary {
   padding: 16px 22px;
