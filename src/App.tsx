@@ -1,6 +1,8 @@
 import { useEffect, useState, type CSSProperties } from 'react'
 import { Intro } from './Intro'
 import { Logo } from './Logo'
+import { Paywall } from './Paywall'
+import { IS_PRO, isLocked, markPaywallSeen, paywallSeenThisOpen } from './pro'
 import {
   CATEGORIES, DEFAULT_BOARD, HOME_LANGS, LANGS, MAX_BOARD, PHRASES, PHRASE_BY_ID,
   type Category, type HomeLang, type Lang, type Phrase,
@@ -132,6 +134,8 @@ export default function App() {
   const [intro, setIntro] = useState(() => !prefersReducedMotion())
   const [skin, setSkin] = useState<Skin>(loadSkin)
   const [picking, setPicking] = useState(false)
+  // Returning users see the paywall once per app open; new users see it right after setup.
+  const [paywall, setPaywall] = useState(() => !!settings && !IS_PRO && !paywallSeenThisOpen())
 
   useEffect(() => {
     if (settings) saveSettings(settings)
@@ -139,8 +143,13 @@ export default function App() {
 
   useEffect(() => applySkin(skin), [skin])
 
+  useEffect(() => {
+    if (paywall) markPaywallSeen()
+  }, [paywall])
+
   const introHome: HomeLang = settings?.home ?? (navigator.language.startsWith('fr') ? 'fr' : 'en')
   const introLayer = intro && <Intro tagline={UI[introHome].tagline} onDone={() => setIntro(false)} />
+  const showPaywall = () => !IS_PRO && setPaywall(true)
 
   if (!settings || screen === 'setup') {
     return (
@@ -152,6 +161,7 @@ export default function App() {
           onDone={(home, target) => {
             setSettings({ home, target, board: settings?.board ?? DEFAULT_BOARD })
             setScreen('board')
+            if (!settings) showPaywall() // first setup = end of onboarding
           }}
         />
         {introLayer}
@@ -191,9 +201,14 @@ export default function App() {
       </header>
 
       {screen === 'board' ? (
-        <Board key="board" settings={settings} onOpen={setOpen} onLibrary={() => setScreen('library')} />
+        <Board
+          key="board"
+          settings={settings}
+          onOpen={(p) => (isLocked(p) ? showPaywall() : setOpen(p))}
+          onLibrary={() => setScreen('library')}
+        />
       ) : (
-        <Library key="library" settings={settings} onToggle={toggle} />
+        <Library key="library" settings={settings} onToggle={toggle} onLocked={showPaywall} />
       )}
 
       {open && <PhraseCard phrase={open} settings={settings} onClose={() => { stopSpeaking(); setOpen(null) }} />}
@@ -206,6 +221,7 @@ export default function App() {
           </div>
         </div>
       )}
+      {paywall && <Paywall home={settings.home} onClose={() => setPaywall(false)} />}
       {introLayer}
     </div>
   )
@@ -357,7 +373,7 @@ function Board({ settings, onOpen, onLibrary }: { settings: Settings; onOpen: (p
             onOpen(p)
           }}
         >
-          <span className="tile-mark" aria-hidden="true">{CAT_MARK[p.cat]}</span>
+          <span className="tile-mark" aria-hidden="true">{isLocked(p) ? '🔒' : CAT_MARK[p.cat]}</span>
           <span className="tile-text">{p.text[settings.home]}</span>
           <span className="tile-target" lang={LANGS[settings.target].locale}>{p.text[settings.target]}</span>
         </button>
@@ -366,7 +382,7 @@ function Board({ settings, onOpen, onLibrary }: { settings: Settings; onOpen: (p
   )
 }
 
-function Library({ settings, onToggle }: { settings: Settings; onToggle: (id: string) => void }) {
+function Library({ settings, onToggle, onLocked }: { settings: Settings; onToggle: (id: string) => void; onLocked: () => void }) {
   const t = UI[settings.home]
   const [cat, setCat] = useState<Category>('insult')
   const full = settings.board.length >= MAX_BOARD
@@ -385,22 +401,28 @@ function Library({ settings, onToggle }: { settings: Settings; onToggle: (id: st
       <ul>
         {PHRASES.filter((p) => p.cat === cat).map((p, i) => {
           const on = settings.board.includes(p.id)
+          // A Pro phrase already on an older board can still be removed.
+          const locked = isLocked(p) && !on
           return (
-            <li key={`${cat}-${p.id}`} style={style({ '--i': i })}>
+            <li key={`${cat}-${p.id}`} className={locked ? 'locked' : ''} style={style({ '--i': i })}>
               <div className="lib-text">
-                <span>{p.text[settings.home]}</span>
+                <span>
+                  {p.text[settings.home]}
+                  {locked && <span className="pro-chip">Pro</span>}
+                </span>
                 <span className="lib-target">{p.text[settings.target]}</span>
               </div>
               <button
-                className={`lib-btn ${on ? 'on' : ''}`}
-                disabled={!on && full}
+                className={`lib-btn ${on ? 'on' : ''}${locked ? ' lock' : ''}`}
+                disabled={!on && !locked && full}
                 onClick={() => {
                   buzz()
-                  onToggle(p.id)
+                  if (locked) onLocked()
+                  else onToggle(p.id)
                 }}
-                aria-label={on ? t.remove : t.add}
+                aria-label={locked ? 'Pro' : on ? t.remove : t.add}
               >
-                {on ? '✓' : '+'}
+                {locked ? '🔒' : on ? '✓' : '+'}
               </button>
             </li>
           )
