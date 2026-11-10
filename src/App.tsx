@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { Flag } from './Flag'
+import { nope, punch, tap, thump, tick, yourTurn } from './haptics'
 import { Intro } from './Intro'
 import { LangSelect } from './LangSelect'
 import { Logo } from './Logo'
@@ -35,14 +36,6 @@ const prefersReducedMotion = () => {
   }
 }
 
-// A short tap on phones that support it (Android). iOS Safari ignores it.
-function buzz() {
-  try {
-    navigator.vibrate?.(10)
-  } catch {
-    // Not supported: silent.
-  }
-}
 
 const style = (vars: Record<string, string | number>) => vars as CSSProperties
 
@@ -654,7 +647,7 @@ function SkinPicker({ home, skin, onSkin }: { home: HomeLang; skin: Skin; onSkin
           className={`skin${skin === s.id ? ' on' : ''}`}
           aria-pressed={skin === s.id}
           onClick={() => {
-            buzz()
+            tick()
             onSkin(s.id)
           }}
         >
@@ -776,7 +769,9 @@ function Board({ settings, onOpen, onLibrary }: { settings: Settings; onOpen: (p
           className={`tile tile-${p.cat} tone-${i % 4}`}
           style={style({ '--i': i, '--tilt': `${TILTS[i % TILTS.length]}deg` })}
           onClick={() => {
-            buzz()
+            if (isLocked(p)) nope()
+            else if (p.cat === 'insult') punch()
+            else thump()
             onOpen(p)
           }}
         >
@@ -823,7 +818,8 @@ function Library({ settings, onToggle, onLocked }: { settings: Settings; onToggl
                 className={`lib-btn ${on ? 'on' : ''}${locked ? ' lock' : ''}`}
                 disabled={!on && !locked && full}
                 onClick={() => {
-                  buzz()
+                  if (locked) nope()
+                  else tap()
                   if (locked) onLocked()
                   else onToggle(p.id)
                 }}
@@ -871,6 +867,7 @@ function PhraseCard({ phrase, settings, onLocked, onClose }: {
     playPhrase(phrase, target, PRACTICE_RATE, () => {
       setSpeaking(false)
       setDrill({ round, phase: 'you' })
+      yourTurn()
       // Give the learner as long as the slow clip took, plus a breath.
       const wait = Math.max(1500, performance.now() - started + 600)
       gap.current = window.setTimeout(() => {
@@ -886,7 +883,11 @@ function PhraseCard({ phrase, settings, onLocked, onClose }: {
   }
 
   const practice = () => {
-    if (!IS_PRO) return onLocked()
+    if (!IS_PRO) {
+      nope()
+      return onLocked()
+    }
+    tap()
     window.clearTimeout(gap.current)
     if (drill) {
       stopSpeaking()
@@ -948,11 +949,11 @@ function PhraseCard({ phrase, settings, onLocked, onClose }: {
         )}
         {silent && <p className="warn">{t.noVoice}</p>}
         <div className="card-actions">
-          <button className={`primary say${speaking ? ' speaking' : ''}`} onClick={() => play()}>
+          <button className={`primary say${speaking ? ' speaking' : ''}`} onClick={() => { tap(); play() }}>
             <span className="bars" aria-hidden="true"><i /><i /><i /><i /></span>
             {t.sayIt}
           </button>
-          <button className="secondary" onClick={() => play(0.7)}>🐢 {t.slow}</button>
+          <button className="secondary" onClick={() => { tap(); play(0.7) }}>🐢 {t.slow}</button>
         </div>
         <button className={`practice${drill ? ' on' : ''}`} onClick={practice} aria-live="polite">
           {drill ? (

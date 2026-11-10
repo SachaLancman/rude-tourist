@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Flag } from './Flag'
+import { tap, tick } from './haptics'
 import type { Lang } from './phrases'
 
 // A dropdown that opens as a bottom sheet: flags and names, easy to thumb through on a phone.
@@ -22,7 +23,7 @@ export function LangSelect<L extends Lang>({ label, value, options, nameOf, plac
 
   return (
     <>
-      <button className={`select${value ? '' : ' unset'}`} onClick={() => setOpen(true)} aria-haspopup="listbox" aria-label={label}>
+      <button className={`select${value ? '' : ' unset'}`} onClick={() => { tap(); setOpen(true) }} aria-haspopup="listbox" aria-label={label}>
         {value && <Flag lang={value} size={28} />}
         <span className="select-name">{value ? nameOf(value) : placeholder}</span>
         <span className="select-chevron" aria-hidden="true">▾</span>
@@ -39,6 +40,7 @@ export function LangSelect<L extends Lang>({ label, value, options, nameOf, plac
                     aria-selected={l === value}
                     className={l === value ? 'on' : ''}
                     onClick={() => {
+                      tick()
                       onChange(l)
                       setOpen(false)
                     }}

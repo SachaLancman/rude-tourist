@@ -1,4 +1,5 @@
 import { useEffect, useState, type CSSProperties } from 'react'
+import { tap, tick } from './haptics'
 import { Logo } from './Logo'
 import { LANGS, PHRASES, type HomeLang } from './phrases'
 import type { Plan } from './pro'
@@ -287,6 +288,7 @@ export function Paywall({ home, onClose }: { home: HomeLang; onClose: () => void
               aria-checked={plan === p}
               className={`pw-plan${plan === p ? ' on' : ''}`}
               onClick={() => {
+                tick()
                 setPlan(p)
                 setTapped(false)
               }}
@@ -301,7 +303,7 @@ export function Paywall({ home, onClose }: { home: HomeLang; onClose: () => void
           ))}
         </div>
 
-        <button className="primary pw-cta" onClick={() => setTapped(true)}>
+        <button className="primary pw-cta" onClick={() => { tap(); setTapped(true) }}>
           {{ trip: t.ctaTrip, year: t.ctaYear, life: t.ctaLife }[plan]}
         </button>
         <p className={`pw-fine${tapped ? ' tapped' : ''}`} aria-live="polite">
