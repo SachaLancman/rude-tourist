@@ -571,6 +571,8 @@ h2 {
 .card-home { margin: 0; color: var(--ink-soft); font-size: 17px; font-style: italic; padding-right: 40px; }
 .card-target {
   margin: 0;
+  /* Japanese, Chinese and Thai have no spaces: let long phrases break anywhere instead of overflowing. */
+  overflow-wrap: anywhere;
   font-family: var(--font-display);
   text-transform: var(--display-case);
   font-size: clamp(34px, 10vw, 48px);
@@ -685,7 +687,7 @@ h2 {
   70% { opacity: 1; }
   100% { opacity: 0; transform: translate(-50%, -50%) rotate(var(--a)) translateX(110px) scale(1.1); }
 }
-.card-target .word { display: inline-block; white-space: pre; animation: word-in 0.45s var(--spring) both; animation-delay: calc(120ms + var(--i) * 70ms); }
+.card-target .word { display: inline-block; max-width: 100%; white-space: pre-wrap; animation: word-in 0.45s var(--spring) both; animation-delay: calc(120ms + var(--i) * 70ms); }
 @keyframes word-in { from { opacity: 0; transform: translateY(0.5em) rotate(-6deg) scale(0.8); } }
 .say { display: inline-flex; align-items: center; justify-content: center; gap: 10px; }
 .bars { display: inline-flex; align-items: flex-end; gap: 3px; height: 16px; }
