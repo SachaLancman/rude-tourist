@@ -1,5 +1,6 @@
 {
   "name": "Rude Tourist",
+  "id": "./?app=rude-tourist",
   "short_name": "Rude Tourist",
   "description": "Insults and survival phrases in 16 languages, spoken aloud.",
   "start_url": "./",
