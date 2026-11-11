@@ -368,6 +368,28 @@ h2 {
 .pw-cta { width: 100%; padding-block: 18px; font-size: 18px; }
 .pw-fine { margin: -4px 0 0; text-align: center; font-size: 13px; color: var(--ink-soft); }
 .pw-fine.tapped { color: var(--terracotta); font-weight: 600; animation: pick-pop 0.35s var(--spring); }
+/* Short phones: keep the whole paywall, button included, on one screen in every language. */
+@media (max-height: 820px) {
+  .pw-inner { gap: 11px; padding-top: 8px; }
+  .pw-logo svg { width: 60px; height: 60px; }
+  .pw-title { font-size: clamp(32px, 9.5vw, 44px); }
+  .pw-sub { font-size: 15px; }
+  .pw-checks { gap: 7px; }
+  .pw-checks li { font-size: 15px; }
+  .pw-tick { width: 22px; height: 22px; font-size: 12px; }
+  .pw-plan { padding: 14px 9px 10px; }
+  .pw-cta { padding-block: 15px; }
+}
+@media (max-height: 680px) {
+  .pw-inner { gap: 8px; padding-top: 4px; }
+  .pw-logo svg { width: 44px; height: 44px; }
+  .pw-title { font-size: clamp(28px, 8.5vw, 38px); }
+  .pw-sub { font-size: 14px; line-height: 1.25; }
+  .pw-checks { gap: 5px; }
+  .pw-checks li { font-size: 14px; }
+  .pw-note { font-size: 11px; }
+  .pw-cta { padding-block: 13px; font-size: 17px; }
+}
 
 /* Look picker */
 .skins { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
