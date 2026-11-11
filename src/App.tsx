@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { Flag } from './Flag'
 import { nope, punch, tap, thump, tick, yourTurn } from './haptics'
 import { Intro } from './Intro'
+import { useEscapeLayer } from './layers'
 import { LangSelect } from './LangSelect'
 import { Logo } from './Logo'
 import { Paywall } from './Paywall'
@@ -520,7 +521,14 @@ const UI = {
   },
 } satisfies Record<HomeLang, Record<string, string>>
 
+// How the app moves, all in one place:
+//   startup  intro (tap to skip) → paywall (once per app open, unless Pro) → setup
+//   screens  setup → board ⇄ library; the language chip goes back to setup
+//   layers   at most one of { phrase card, look picker } over a screen; the paywall can open
+//            over anything (a locked tap) and always sits on top
+//   Escape   closes only the topmost layer (layers.ts)
 type Screen = 'setup' | 'board' | 'library'
+type Layer = { kind: 'card'; phrase: Phrase } | { kind: 'look' } | null
 
 // The device language when the app speaks it, else English.
 function deviceHome(): HomeLang {
@@ -532,11 +540,12 @@ export default function App() {
   const [settings, setSettings] = useState<Settings | null>(loadSettings)
   // Every open: intro, then the paywall, then the language picker (pre-filled for returning users).
   const [screen, setScreen] = useState<Screen>('setup')
-  const [open, setOpen] = useState<Phrase | null>(null)
+  const [layer, setLayer] = useState<Layer>(null)
   const [intro, setIntro] = useState(() => !prefersReducedMotion())
   const [skin, setSkin] = useState<Skin>(loadSkin)
-  const [picking, setPicking] = useState(false)
   const [paywall, setPaywall] = useState(() => !IS_PRO && !paywallSeenThisOpen())
+  // Kept here so the library reopens on the category you left, not on Insults every time.
+  const [libCat, setLibCat] = useState<Category>('insult')
 
   useEffect(() => {
     if (settings) saveSettings(settings)
@@ -551,7 +560,8 @@ export default function App() {
   const uiHome: HomeLang = settings?.home ?? deviceHome()
   const introLayer = intro && <Intro tagline={UI[uiHome].tagline} onDone={() => setIntro(false)} />
   const showPaywall = () => !IS_PRO && setPaywall(true)
-  const paywallLayer = paywall && <Paywall home={uiHome} onClose={() => setPaywall(false)} />
+  // Mounted only after the intro, so its slide-in plays where the user can see it.
+  const paywallLayer = paywall && !intro && <Paywall home={uiHome} onClose={() => setPaywall(false)} />
 
   if (!settings || screen === 'setup') {
     return (
@@ -590,7 +600,7 @@ export default function App() {
             <Flag lang={settings.target} size={20} />
             <span className="lang-chip-name">{LANGS[settings.target].name[settings.home]}</span>
           </button>
-          <button className="look-btn" onClick={() => setPicking(true)} aria-label={t.look}>
+          <button className="look-btn" onClick={() => setLayer({ kind: 'look' })} aria-label={t.look}>
             <SwatchDots colors={SKINS.find((s) => s.id === skin)!.swatch} />
             {t.look}
           </button>
@@ -606,22 +616,27 @@ export default function App() {
         <Board
           key="board"
           settings={settings}
-          onOpen={(p) => (isLocked(p) ? showPaywall() : setOpen(p))}
+          onOpen={(p) => (isLocked(p) ? showPaywall() : setLayer({ kind: 'card', phrase: p }))}
           onLibrary={() => setScreen('library')}
         />
       ) : (
-        <Library key="library" settings={settings} onToggle={toggle} onLocked={showPaywall} />
+        <Library key="library" settings={settings} cat={libCat} onCat={setLibCat} onToggle={toggle} onLocked={showPaywall} />
       )}
 
-      {open && <PhraseCard phrase={open} settings={settings} onLocked={showPaywall} onClose={() => { stopSpeaking(); setOpen(null) }} />}
-      {picking && (
-        <div className="overlay" onClick={() => setPicking(false)}>
-          <div className="card" role="dialog" aria-modal="true" aria-label={t.look} onClick={(e) => e.stopPropagation()}>
-            <button className="close" onClick={() => setPicking(false)} aria-label="Close">×</button>
-            <h2>{t.look}</h2>
-            <SkinPicker home={settings.home} skin={skin} onSkin={setSkin} />
-          </div>
-        </div>
+      {layer?.kind === 'card' && (
+        <PhraseCard
+          key={layer.phrase.id}
+          phrase={layer.phrase}
+          settings={settings}
+          onLocked={showPaywall}
+          onClose={() => {
+            stopSpeaking()
+            setLayer(null)
+          }}
+        />
+      )}
+      {layer?.kind === 'look' && (
+        <LookSheet title={t.look} home={settings.home} skin={skin} onSkin={setSkin} onClose={() => setLayer(null)} />
       )}
       {paywallLayer}
       {introLayer}
@@ -634,6 +649,25 @@ function SwatchDots({ colors }: { colors: string[] }) {
     <span className="swatch-dots" aria-hidden="true">
       {colors.map((c, i) => <i key={i} style={{ background: c }} />)}
     </span>
+  )
+}
+
+function LookSheet({ title, home, skin, onSkin, onClose }: {
+  title: string
+  home: HomeLang
+  skin: Skin
+  onSkin: (s: Skin) => void
+  onClose: () => void
+}) {
+  useEscapeLayer(onClose)
+  return (
+    <div className="overlay" onClick={onClose}>
+      <div className="card" role="dialog" aria-modal="true" aria-label={title} onClick={(e) => e.stopPropagation()}>
+        <button className="close" onClick={onClose} aria-label="Close">×</button>
+        <h2>{title}</h2>
+        <SkinPicker home={home} skin={skin} onSkin={onSkin} />
+      </div>
+    </div>
   )
 }
 
@@ -784,16 +818,21 @@ function Board({ settings, onOpen, onLibrary }: { settings: Settings; onOpen: (p
   )
 }
 
-function Library({ settings, onToggle, onLocked }: { settings: Settings; onToggle: (id: string) => void; onLocked: () => void }) {
+function Library({ settings, cat, onCat, onToggle, onLocked }: {
+  settings: Settings
+  cat: Category
+  onCat: (c: Category) => void
+  onToggle: (id: string) => void
+  onLocked: () => void
+}) {
   const t = UI[settings.home]
-  const [cat, setCat] = useState<Category>('insult')
   const full = settings.board.length >= MAX_BOARD
 
   return (
     <main className="library">
       <div className="chips" role="tablist">
         {CATEGORIES.map((c) => (
-          <button key={c} role="tab" aria-selected={cat === c} className={cat === c ? 'on' : ''} onClick={() => setCat(c)}>
+          <button key={c} role="tab" aria-selected={cat === c} className={cat === c ? 'on' : ''} onClick={() => onCat(c)}>
             <span aria-hidden="true">{CAT_MARK[c]}</span>
             {t[c]}
           </button>
@@ -839,7 +878,12 @@ function Library({ settings, onToggle, onLocked }: { settings: Settings; onToggl
 const PRACTICE_RATE = 0.5
 const PRACTICE_ROUNDS = 3
 
-type Drill = { round: number; phase: 'listen' | 'you' }
+// What the card's voice is doing. "Silent" (no clip and no device voice) is a separate,
+// sticky flag: it is a fact about the device, not a step in this flow.
+type Voice =
+  | { kind: 'idle' }
+  | { kind: 'speaking' }
+  | { kind: 'drill'; round: number; phase: 'listen' | 'you' }
 
 function PhraseCard({ phrase, settings, onLocked, onClose }: {
   phrase: Phrase
@@ -849,63 +893,59 @@ function PhraseCard({ phrase, settings, onLocked, onClose }: {
 }) {
   const t = UI[settings.home]
   const target = settings.target
+  const [voice, setVoice] = useState<Voice>({ kind: 'idle' })
   const [silent, setSilent] = useState(false)
-  const [speaking, setSpeaking] = useState(false)
-  const [drill, setDrill] = useState<Drill | null>(null)
   const gap = useRef<number | undefined>(undefined)
   const pron = pronFor(phrase, target, settings.home)
+  const drill = voice.kind === 'drill' ? voice : null
+  const speaking = voice.kind === 'speaking' || drill?.phase === 'listen'
 
-  const stopDrill = () => {
+  // Every new action starts from here: it cancels whatever was playing or waiting.
+  const halt = () => {
     window.clearTimeout(gap.current)
-    setDrill(null)
+    stopSpeaking()
+    setVoice({ kind: 'idle' })
   }
 
   const drillRound = (round: number) => {
-    setDrill({ round, phase: 'listen' })
-    setSpeaking(true)
+    setVoice({ kind: 'drill', round, phase: 'listen' })
     const started = performance.now()
     playPhrase(phrase, target, PRACTICE_RATE, () => {
-      setSpeaking(false)
-      setDrill({ round, phase: 'you' })
+      setVoice({ kind: 'drill', round, phase: 'you' })
       yourTurn()
       // Give the learner as long as the slow clip took, plus a breath.
       const wait = Math.max(1500, performance.now() - started + 600)
       gap.current = window.setTimeout(() => {
         if (round < PRACTICE_ROUNDS) drillRound(round + 1)
-        else setDrill(null)
+        else setVoice({ kind: 'idle' })
       }, wait)
     }).then((ok) => {
       if (ok) return
       setSilent(true)
-      setSpeaking(false)
-      setDrill(null)
+      setVoice({ kind: 'idle' })
     })
   }
 
   const practice = () => {
     if (!IS_PRO) {
       nope()
+      halt() // the paywall opens on top: don't keep talking under it
       return onLocked()
     }
     tap()
-    window.clearTimeout(gap.current)
-    if (drill) {
-      stopSpeaking()
-      setSpeaking(false)
-      setDrill(null)
-      return
-    }
-    drillRound(1)
+    const wasDrilling = drill !== null
+    halt()
+    if (!wasDrilling) drillRound(1)
   }
 
   useEffect(() => () => window.clearTimeout(gap.current), [])
 
   const play = (rate = 1) => {
-    stopDrill()
-    setSpeaking(true)
-    playPhrase(phrase, target, rate, () => setSpeaking(false)).then((ok) => {
+    halt()
+    setVoice({ kind: 'speaking' })
+    playPhrase(phrase, target, rate, () => setVoice({ kind: 'idle' })).then((ok) => {
       setSilent(!ok)
-      if (!ok) setSpeaking(false)
+      if (!ok) setVoice({ kind: 'idle' })
     })
   }
   const words = phrase.text[target].split(' ')
@@ -916,11 +956,7 @@ function PhraseCard({ phrase, settings, onLocked, onClose }: {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phrase.id, target])
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [onClose])
+  useEscapeLayer(onClose)
 
   return (
     <div className="overlay" onClick={onClose}>

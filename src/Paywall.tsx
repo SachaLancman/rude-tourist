@@ -1,5 +1,6 @@
-import { useEffect, useState, type CSSProperties } from 'react'
+import { useState, type CSSProperties } from 'react'
 import { tap, tick } from './haptics'
+import { useEscapeLayer } from './layers'
 import { Logo } from './Logo'
 import { LANGS, PHRASES, type HomeLang } from './phrases'
 import type { Plan } from './pro'
@@ -257,11 +258,7 @@ export function Paywall({ home, onClose }: { home: HomeLang; onClose: () => void
   const [plan, setPlan] = useState<Plan>('year')
   const [tapped, setTapped] = useState(false)
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [onClose])
+  useEscapeLayer(onClose)
 
   return (
     <div className="paywall" role="dialog" aria-modal="true" aria-label={t.headline}>
